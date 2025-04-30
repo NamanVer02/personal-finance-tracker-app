@@ -17,6 +17,8 @@ import { StatusBar } from "expo-status-bar";
 import { useColorScheme } from "nativewind";
 import * as ImagePicker from "expo-image-picker";
 import { useNavigation } from "@react-navigation/native";
+import { RegisterRequestDTO } from "interfaces/dto";
+import { register } from "services/authService";
 
 
 export default function Register() {
@@ -31,8 +33,19 @@ export default function Register() {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     // Placeholder function - you'll implement actual registration later
-    const handleRegister = () => {
-        console.log("Registration attempted with:", { username, email, password, confirmPassword, avatar });
+    const handleRegister = async () => {
+        const registerRequest: RegisterRequestDTO = {
+            username: username,
+            email: email,
+            password: password,
+            roles: ["user"],
+            profileImage: avatar || "",
+        }
+
+        const result = await register(registerRequest);
+        if (result.ok) {
+            navigation.navigate("Login");
+        }
     };
 
     // Handle avatar upload

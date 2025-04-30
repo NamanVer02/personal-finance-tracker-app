@@ -14,6 +14,7 @@ import { StatusBar } from "expo-status-bar";
 import { useColorScheme } from "nativewind";
 import { CommonActions, useNavigation } from "@react-navigation/native";
 import { login } from "services/authService";
+import { LoginRequestDTO } from "interfaces/dto";
 
 export default function Login() {
   const navigation = useNavigation();
@@ -26,7 +27,13 @@ export default function Login() {
 
   // Placeholder function - you'll implement actual login later
   const handleLogin = async () => {
-    const result = await login({username: username, password: password, twoFactorCode: twoFactorCode});
+    const loginRequest: LoginRequestDTO = {
+      username: username,
+      password: password,
+      twoFactorCode: twoFactorCode,
+    };
+
+    const result = await login(loginRequest);
 
     if (result.ok) {
       navigation.dispatch(

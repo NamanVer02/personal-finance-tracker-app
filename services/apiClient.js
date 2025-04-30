@@ -3,24 +3,30 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const apiClient = axios.create({
   baseURL: 'http://192.168.127.180:8080',
-  headers: { 'Content-Type': 'application/json' },
 });
 
+// Request interceptor
 apiClient.interceptors.request.use(
-    async (config) => {
-      if (config.headers && config.headers.skipAuth) {
-        // Remove the skipAuth flag before sending
-        delete config.headers.skipAuth;
-        return config;
-      }
-      // Attach token as usual
-      const token = await AsyncStorage.getItem('accessToken');
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
+  async (config) => {
+    // If skipAuth, don't attach token
+    if (config.headers && config.headers.skipAuth) {
+      delete config.headers.skipAuth;
       return config;
-    },
-    (error) => Promise.reject(error)
-  );
+    }
+    // Attach Authorization token if available
+    const token = await AsyncStorage.getItem('accessToken');
+    if (token) {
+      config.headers = config.headers || {};
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    // If Content-Type is not set, default to application/json
+    if (!config.headers || !config.headers['Content-Type']) {
+      config.headers = config.headers || {};
+      config.headers['Content-Type'] = 'application/json';
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
 export default apiClient;
