@@ -1,10 +1,31 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ['./App.{js,ts,tsx}', './components/**/*.{js,ts,tsx}'],
-
-  presets: [require('nativewind/preset')],
+  // Include paths to all your component files
+  content: [
+    "./app/**/*.{js,jsx,ts,tsx}", 
+    "./components/**/*.{js,jsx,ts,tsx}", 
+    "./App/**/*.{js,jsx,ts,tsx}", "./*.tsx",
+    "./screens/**/*.{js,jsx,ts,tsx}",
+  ],
+  presets: [require("nativewind/preset")],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        accent: {
+          DEFAULT: 'rgb(var(--accent) / <alpha-value>)',
+          dark: 'rgb(var(--accent-dark) / <alpha-value>)',
+          light: 'rgb(var(--accent-light) / <alpha-value>)',
+        },
+        bg: 'rgb(var(--bg) / <alpha-value>)',
+        text: {
+          DEFAULT: 'rgb(var(--text) / <alpha-value>)',
+          light: 'rgb(var(--text-light) / <alpha-value>)',
+        },
+      },
+      borderRadius: {
+        custom: 'var(--border-radius)',
+      },
+    },
   },
   plugins: [],
 };

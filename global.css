@@ -1,3 +1,25 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  :root {
+    /* Convert hex to RGB values */
+    --accent: 143 92 247;       /* #8f5cf7 */
+    --accent-dark: 108 63 192;  /* #6c3fc0 */
+    --accent-light: 243 239 252; /* #f3effc */
+    --bg: 249 247 252;          /* #f9f7fc */
+    --text: 45 35 68;           /* #2d2344 */
+    --text-light: 138 124 168;  /* #8a7ca8 */
+    --border-radius: 12px;
+  }
+
+  /* You can add dark mode support here */
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: 45 35 68;           /* Using text color as bg in dark mode */
+      --text: 249 247 252;      /* Using bg color as text in dark mode */
+      /* Keep other colors as needed */
+    }
+  }
+}
