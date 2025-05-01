@@ -13,10 +13,7 @@ export const login = async (loginRequest: LoginRequestDTO) => {
     );
 
     const loginResponse: LoginResponseDTO = response.data;
-
-    // Store tokens securely
-    await SecureStore.setItemAsync('accessToken', loginResponse.accessToken);
-
+    
     // Destructure user fields from loginResponse
     const {
       id,
@@ -37,6 +34,8 @@ export const login = async (loginRequest: LoginRequestDTO) => {
       profileImage,
       tokenType,
     };
+
+    await SecureStore.setItemAsync('user', JSON.stringify(user));
 
     return {
       ok: true,

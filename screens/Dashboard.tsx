@@ -1,220 +1,147 @@
-import React from 'react';
-import {
-  SafeAreaView,
-  View,
-  Text,
-  FlatList,
-  TouchableOpacity,
-  ScrollView,
-  Dimensions,
-} from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { MaterialIcons, Feather, AntDesign, FontAwesome } from '@expo/vector-icons';
+import { SafeAreaView, ScrollView, StatusBar, Text, TouchableOpacity, View } from 'react-native';
+import { Octicons } from '@expo/vector-icons';
+import * as SecureStore from 'expo-secure-store';
+import { User } from 'interfaces/dto';
+import { useUser } from 'contexts/UserContext';
 
-const { width } = Dimensions.get('window');
+export default function Dashboard() {
+  const { user } = useUser();
 
-const transactions = [
-  {
-    id: '1',
-    name: 'Upwork',
-    icon: <FontAwesome name="arrow-up" size={28} color="#6fda44" style={{ marginRight: 10 }} />,
-    date: 'Today',
-    amount: 850,
-    type: 'income',
-  },
-  {
-    id: '2',
-    name: 'Transfur',
-    icon: <FontAwesome name="user" size={28} color="#888" style={{ marginRight: 10 }} />,
-    date: 'Monday',
-    amount: -85,
-    type: 'expense',
-  },
-  {
-    id: '3',
-    name: 'Paypal',
-    icon: <FontAwesome name="paypal" size={28} color="#003087" style={{ marginRight: 10 }} />,
-    date: 'Jan 20, 2022',
-    amount: 1406,
-    type: 'income',
-  },
-  {
-    id: '4',
-    name: 'YouTube',
-    icon: <FontAwesome name="youtube-play" size={28} color="#ff0000" style={{ marginRight: 10 }} />,
-    date: 'Jan 16, 2022',
-    amount: -11.99,
-    type: 'expense',
-  },
-];
+  if (!user) {
+    return <Text>Loading user...</Text>;
+  }
 
-const sendAgain = [
-  { id: 1, initials: 'AB', color: '#a084fa' },
-  { id: 2, initials: 'JS', color: '#8f5cf7' },
-  { id: 3, initials: '😊', color: '#ffd700' },
-  { id: 4, initials: 'RK', color: '#6fda44' },
-  { id: 5, initials: 'MG', color: '#ffb347' },
-];
-
-export default function DashboardScreen() {
   return (
-    <SafeAreaView className="flex-1 bg-[rgb(var(--bg))]">
-      <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
-        {/* Header Gradient */}
-        <LinearGradient
-          colors={['#a084fa', '#8f5cf7']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0.7 }}
-          style={{
-            paddingBottom: 36,
-            paddingTop: 32,
-            paddingHorizontal: 20,
-            borderBottomLeftRadius: 32,
-            borderBottomRightRadius: 32,
-          }}
-        >
-          <View className="flex-row justify-between items-center mb-4.5">
-            <View>
-              <Text className="text-white text-xs opacity-80">Good afternoon,</Text>
-              <Text className="text-white font-bold text-xl mt-0.5">David Smith</Text>
-            </View>
-            <TouchableOpacity>
-              <MaterialIcons name="notifications-none" size={26} color="white" style={{ opacity: 0.8 }} />
-            </TouchableOpacity>
-          </View>
+    <SafeAreaView className="flex-1 bg-gray-50">
+      <StatusBar barStyle="dark-content" backgroundColor="#f9fafb" />
+      <ScrollView className="flex-1 p-4">
 
-          {/* Balance Card */}
-          <View className="bg-white/15 rounded-2xl p-5 shadow-md">
-            <View className="flex-row justify-between items-center mb-2">
-              <Text className="text-white text-sm opacity-80 font-medium">Total Balance</Text>
-              <TouchableOpacity>
-                <Feather name="more-horizontal" size={20} color="#fff" style={{ opacity: 0.8 }} />
-              </TouchableOpacity>
-            </View>
-            <Text className="text-white text-3xl font-bold mb-2.5">$2,548.00</Text>
-            <View className="flex-row justify-between mt-2.5">
-              <View className="items-center">
-                <Text className="text-white text-xs opacity-70">Income</Text>
-                <Text className="text-white text-lg font-semibold mt-0.5">$1,840.00</Text>
-              </View>
-              <View className="items-center">
-                <Text className="text-white text-xs opacity-70">Expenses</Text>
-                <Text className="text-white text-lg font-semibold mt-0.5">$284.00</Text>
-              </View>
-            </View>
+        {/* Header */}
+        <View className="flex-row justify-between items-center px-4 pt-2 pb-8">
+          <View>
+            <Text className="text-text-light text-sm">Welcome back</Text>
+            <Text className="text-text text-3xl font-bold">{user.username}</Text>
           </View>
-        </LinearGradient>
-
-        {/* Transactions History */}
-        <View className="mt-6">
-          <View className="flex-row justify-between items-center mb-2">
-            <Text className="font-bold text-base text-[rgb(var(--text))]">Transactions History</Text>
-            <TouchableOpacity>
-              <Text className="text-[rgb(var(--accent))] text-xs font-medium">See all</Text>
-            </TouchableOpacity>
-          </View>
-          <View className="bg-white rounded-xl py-0.5 px-0 shadow-sm">
-            {transactions.map(txn => (
-              <View
-                key={txn.id}
-                className="flex-row justify-between items-center py-4 px-4.5 border-b border-b-[#f2f2f2]"
-              >
-                <View className="flex-row items-center">
-                  {txn.icon}
-                  <View>
-                    <Text className="font-semibold text-sm text-[rgb(var(--text))]">{txn.name}</Text>
-                    <Text className="text-xs text-[rgb(var(--text-light))] mt-0.5">{txn.date}</Text>
-                  </View>
-                </View>
-                <Text
-                  className={[
-                    'font-bold text-sm',
-                    txn.type === 'income'
-                      ? 'text-[#2ecc71]'
-                      : 'text-[#e74c3c]',
-                  ].join(' ')}
-                >
-                  {txn.type === 'income' ? '+' : '-'} ${Math.abs(txn.amount).toLocaleString()}
-                </Text>
-              </View>
-            ))}
-          </View>
+          <TouchableOpacity className="w-10 h-10 bg-gray-100 rounded-full items-center justify-center">
+            <Octicons name="bell" size={20} color="#6b7280" />
+          </TouchableOpacity>
         </View>
 
-        {/* Send Again */}
-        <View className="mt-6">
-          <View className="flex-row justify-between items-center mb-2">
-            <Text className="font-bold text-base text-[rgb(var(--text))]">Send Again</Text>
+        {/* Balance Card */}
+        <View className="mx-4 p-6 bg-purple-500 rounded-2xl shadow-lg">
+        <Text className="text-purple-200 text-base font-medium mb-2">Total Balance</Text>
+        <Text className="text-white text-4xl font-bold mb-6">$8,246.57</Text>
+        <View className="flex-row justify-between">
+          <View className="flex-1 bg-purple-300/50 rounded-xl mr-2 p-4 items-center">
+            <Text className="text-purple-100 text-xs mb-1">Income</Text>
+            <Text className="text-white text-lg font-bold">$12,450.00</Text>
+          </View>
+          <View className="flex-1 bg-purple-300/50 rounded-xl ml-2 p-4 items-center">
+            <Text className="text-purple-100 text-xs mb-1">Expenses</Text>
+            <Text className="text-white text-lg font-bold">$4,203.43</Text>
+          </View>
+        </View>
+      </View>
+
+
+        {/* Quick Actions */}
+        <View className="flex-row justify-between px-8 mt-10">
+          <TouchableOpacity className="items-center">
+            <View className="w-12 h-12 bg-purple-100 rounded-full items-center justify-center">
+              <Octicons name="paper-airplane" size={20} color="#8b5cf6" />
+            </View>
+            <Text className="text-xs mt-1 text-gray-700">Send</Text>
+          </TouchableOpacity>
+          <TouchableOpacity className="items-center">
+            <View className="w-12 h-12 bg-purple-100 rounded-full items-center justify-center">
+              <Octicons name="plus" size={20} color="#8b5cf6" />
+            </View>
+            <Text className="text-xs mt-1 text-gray-700">Add</Text>
+          </TouchableOpacity>
+          <TouchableOpacity className="items-center">
+            <View className="w-12 h-12 bg-purple-100 rounded-full items-center justify-center">
+              <Octicons name="credit-card" size={20} color="#8b5cf6" />
+            </View>
+            <Text className="text-xs mt-1 text-gray-700">Cards</Text>
+          </TouchableOpacity>
+          <TouchableOpacity className="items-center">
+            <View className="w-12 h-12 bg-purple-100 rounded-full items-center justify-center">
+              <Octicons name="note" size={20} color="#8b5cf6" />
+            </View>
+            <Text className="text-xs mt-1 text-gray-700">Loans</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Recent Transactions */}
+        <View className="mt-14 px-4 mb-20">
+          <View className="flex-row justify-between items-center mb-4">
+            <Text className="text-lg font-semibold">Recent Transactions</Text>
             <TouchableOpacity>
-              <Text className="text-[rgb(var(--accent))] text-xs font-medium">See all</Text>
+              <Text className="text-text">See All</Text>
             </TouchableOpacity>
           </View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mt-2">
-            {sendAgain.map((item) => (
-              <View
-                key={item.id}
-                style={{
-                  width: 48,
-                  height: 48,
-                  borderRadius: 24,
-                  marginRight: 14,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  backgroundColor: item.color,
-                }}
-              >
-                <Text className="text-white font-bold text-lg">
-                  {item.initials}
-                </Text>
+          
+          {/* Transaction Items */}
+          <View className="bg-white p-4 rounded-xl shadow-sm mb-3">
+            <View className="flex-row items-center">
+              <View className="w-10 h-10 bg-purple-100 rounded-full items-center justify-center mr-3">
+                <Octicons name="credit-card" size={20} color="#8b5cf6" />
               </View>
-            ))}
-          </ScrollView>
+              <View className="flex-1">
+                <Text className="font-medium">Amazon</Text>
+                <Text className="text-xs text-gray-500">May 1, 2025</Text>
+              </View>
+              <Text className="font-semibold text-red-500">-$34.50</Text>
+            </View>
+          </View>
+          
+          <View className="bg-white p-4 rounded-xl shadow-sm mb-3">
+            <View className="flex-row items-center">
+              <View className="w-10 h-10 bg-purple-100 rounded-full items-center justify-center mr-3">
+                <Octicons name="paper-airplane" size={20} color="#8b5cf6" />
+              </View>
+              <View className="flex-1">
+                <Text className="font-medium">Transfer to Sarah</Text>
+                <Text className="text-xs text-gray-500">Apr 30, 2025</Text>
+              </View>
+              <Text className="font-semibold text-red-500">-$120.00</Text>
+            </View>
+          </View>
+          
+          <View className="bg-white p-4 rounded-xl shadow-sm">
+            <View className="flex-row items-center">
+              <View className="w-10 h-10 bg-green-100 rounded-full items-center justify-center mr-3">
+                <Octicons name="arrow-down" size={20} color="#10b981" />
+              </View>
+              <View className="flex-1">
+                <Text className="font-medium">Salary Deposit</Text>
+                <Text className="text-xs text-gray-500">Apr 28, 2025</Text>
+              </View>
+              <Text className="font-semibold text-green-500">+$2,450.00</Text>
+            </View>
+          </View>
         </View>
       </ScrollView>
 
-      {/* Floating Action Button */}
-      <TouchableOpacity
-        style={{
-          position: 'absolute',
-          bottom: 34,
-          left: width / 2 - 32,
-          width: 64,
-          height: 64,
-          borderRadius: 32,
-          backgroundColor: 'rgb(var(--accent))',
-          justifyContent: 'center',
-          alignItems: 'center',
-          elevation: 8,
-          shadowColor: '#8f5cf7',
-          shadowOffset: { width: 0, height: 3 },
-          shadowOpacity: 0.32,
-          shadowRadius: 8,
-          zIndex: 10,
-        }}
-      >
-        <AntDesign name="plus" size={32} color="#fff" />
-      </TouchableOpacity>
-
       {/* Bottom Navigation */}
-      <View
-  className="absolute left-0 right-0 flex-row items-center justify-around bg-white border-t border-t-[#f2f2f2] px-3 z-10"
-  style={{ bottom: 0, height: 68 }}
->
-  <TouchableOpacity className="flex-1 items-center justify-center">
-    <AntDesign name="home" size={24} color="#8f5cf7" />
-  </TouchableOpacity>
-  <TouchableOpacity className="flex-1 items-center justify-center">
-    <Feather name="bar-chart-2" size={24} color="#b3b3b3" />
-  </TouchableOpacity>
-  <View style={{ width: 64 }} /> {/* FAB Spacer */}
-  <TouchableOpacity className="flex-1 items-center justify-center">
-    <Feather name="credit-card" size={24} color="#b3b3b3" />
-  </TouchableOpacity>
-  <TouchableOpacity className="flex-1 items-center justify-center">
-    <FontAwesome name="user-o" size={24} color="#b3b3b3" />
-  </TouchableOpacity>
-</View>
-
+      <View className="absolute bottom-0 left-0 right-0 flex-row justify-around items-center bg-white pt-2 pb-6 border-t border-gray-200">
+        <TouchableOpacity className="items-center">
+          <Octicons name="home" size={24} color="#8b5cf6" />
+          <Text className="text-xs mt-1 text-purple-500">Home</Text>
+        </TouchableOpacity>
+        <TouchableOpacity className="items-center">
+          <Octicons name="graph" size={24} color="#9ca3af" />
+          <Text className="text-xs mt-1 text-gray-400">Stats</Text>
+        </TouchableOpacity>
+        <TouchableOpacity className="items-center">
+          <Octicons name="credit-card" size={24} color="#9ca3af" />
+          <Text className="text-xs mt-1 text-gray-400">Cards</Text>
+        </TouchableOpacity>
+        <TouchableOpacity className="items-center">
+          <Octicons name="person" size={24} color="#9ca3af" />
+          <Text className="text-xs mt-1 text-gray-400">Profile</Text>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 }
