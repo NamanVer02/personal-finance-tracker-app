@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+// EditTransactionModal.tsx
+import React, { useState, useEffect } from 'react';
 import {
   Modal,
   View,
@@ -13,65 +14,65 @@ import { Octicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Category, Transaction } from 'interfaces/types';
 import { AddTransactionModalProps } from 'interfaces/props';
-import { addTransaction } from 'services/transactionService';
-import { AddTransactionDTO } from 'interfaces/dto';
 
-const AddTransactionModal: React.FC<AddTransactionModalProps> = ({ visible, onClose, onSave }) => {
+interface EditTransactionModalProps extends AddTransactionModalProps {
+  transactionToEdit?: Transaction | null;
+  onEdit: (updated: Transaction) => void;
+}
+
+const expenseCategories: Category[] = [
+  { id: 1, name: 'Food & Drinks', icon: 'flame' },
+  { id: 2, name: 'Shopping', icon: 'package' },
+  { id: 3, name: 'Transportation', icon: 'rocket' },
+  { id: 4, name: 'Bills', icon: 'note' },
+  { id: 5, name: 'Entertainment', icon: 'device-camera-video' },
+  { id: 6, name: 'Health', icon: 'pulse' },
+  { id: 7, name: 'Education', icon: 'book' },
+  { id: 8, name: 'Other', icon: 'ellipsis' },
+];
+
+const incomeCategories: Category[] = [
+  { id: 1, name: 'Salary', icon: 'briefcase' },
+  { id: 2, name: 'Investments', icon: 'graph' },
+  { id: 3, name: 'Gifts', icon: 'gift' },
+  { id: 4, name: 'Refunds', icon: 'arrow-switch' },
+  { id: 5, name: 'Other', icon: 'ellipsis' },
+];
+
+const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
+  visible,
+  onClose,
+  transactionToEdit,
+  onEdit,
+}) => {
   const [transactionType, setTransactionType] = useState<'Expense' | 'Income'>('Expense');
-  const [label, setLabel] = useState<string>('');
-  const [amount, setAmount] = useState<string>('');
+  const [label, setLabel] = useState('');
+  const [amount, setAmount] = useState('');
   const [category, setCategory] = useState<Category | null>(null);
-  const [showCategories, setShowCategories] = useState<boolean>(false);
+  const [showCategories, setShowCategories] = useState(false);
   const [date, setDate] = useState<Date>(new Date());
-  const [showDatePicker, setShowDatePicker] = useState<boolean>(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
-  // Categories based on transaction type
-  const expenseCategories: Category[] = [
-    { id: 1, name: 'Food & Drinks', icon: 'flame' },
-    { id: 2, name: 'Shopping', icon: 'package' },
-    { id: 3, name: 'Transportation', icon: 'rocket' },
-    { id: 4, name: 'Bills', icon: 'note' },
-    { id: 5, name: 'Entertainment', icon: 'device-camera-video' },
-    { id: 6, name: 'Health', icon: 'pulse' },
-    { id: 7, name: 'Education', icon: 'book' },
-    { id: 8, name: 'Other', icon: 'ellipsis' },
-  ];
+  useEffect(() => {
+    if (transactionToEdit) {
+      setTransactionType(transactionToEdit.type as 'Expense' | 'Income');
+      setLabel(transactionToEdit.label);
+      setAmount(transactionToEdit.amount.toString());
 
-  const incomeCategories: Category[] = [
-    { id: 1, name: 'Salary', icon: 'briefcase' },
-    { id: 2, name: 'Investments', icon: 'graph' },
-    { id: 3, name: 'Gifts', icon: 'gift' },
-    { id: 4, name: 'Refunds', icon: 'arrow-switch' },
-    { id: 5, name: 'Other', icon: 'ellipsis' },
-  ];
+      const categories =
+        transactionToEdit.type === 'Expense' ? expenseCategories : incomeCategories;
+      const foundCategory = categories.find((cat) => cat.name === transactionToEdit.category);
+      setCategory(foundCategory || null);
+
+      setDate(
+        transactionToEdit.date instanceof Date
+          ? transactionToEdit.date
+          : new Date(transactionToEdit.date)
+      );
+    }
+  }, [transactionToEdit, visible]);
 
   const currentCategories = transactionType === 'Expense' ? expenseCategories : incomeCategories;
-
-  const handleSave = (): void => {
-    if (!label || !amount || !category) {
-      // Validate fields
-      alert('Please fill all required fields');
-      return;
-    }
-
-    const transaction: AddTransactionDTO = {
-      type: transactionType,
-      label,
-      amount: parseFloat(amount),
-      category: category.name,
-      date: date.toISOString().split('T')[0],
-    };
-
-    addTransaction(transaction);
-
-    // Reset form
-    setTransactionType('Expense');
-    setLabel('');
-    setAmount('');
-    setCategory(null);
-    setDate(new Date());
-    onClose();
-  };
 
   const formatDate = (date: Date): string => {
     return date.toLocaleDateString('en-US', {
@@ -87,6 +88,24 @@ const AddTransactionModal: React.FC<AddTransactionModalProps> = ({ visible, onCl
     setDate(currentDate);
   };
 
+  const handleSave = () => {
+    if (!label || !amount || !category) {
+      alert('Please fill all required fields');
+      return;
+    }
+    if (transactionToEdit) {
+      onEdit({
+        ...transactionToEdit,
+        type: transactionType,
+        label,
+        amount: parseFloat(amount),
+        category: category.name,
+        date: date,
+      });
+    }
+    onClose();
+  };
+
   return (
     <Modal animationType="slide" transparent={true} visible={visible} onRequestClose={onClose}>
       <KeyboardAvoidingView
@@ -96,7 +115,7 @@ const AddTransactionModal: React.FC<AddTransactionModalProps> = ({ visible, onCl
           <View className="h-4/5 rounded-t-3xl bg-white p-6">
             {/* Header */}
             <View className="mb-6 flex-row items-center justify-between">
-              <Text className="text-2xl font-bold text-gray-800">Add Transaction</Text>
+              <Text className="text-2xl font-bold text-gray-800">Edit Transaction</Text>
               <TouchableOpacity onPress={onClose} className="p-2">
                 <Octicons name="x" size={24} color="#6b7280" />
               </TouchableOpacity>
@@ -237,4 +256,4 @@ const AddTransactionModal: React.FC<AddTransactionModalProps> = ({ visible, onCl
   );
 };
 
-export default AddTransactionModal;
+export default EditTransactionModal;

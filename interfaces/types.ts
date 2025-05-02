@@ -20,15 +20,44 @@ export interface Category {
 }
 
 export interface Transaction {
-  type: 'Expense' | 'Income';
-  label: string;
+  id: number;
   amount: number;
-  category: Category;
+  category: string;
+  createdAt: string;
+  createdBy: string;
   date: Date;
+  label: string;
+  type: 'Expense' | 'Income';
+  updatedAt: string;
+  updatedBy: string;
+  user: User;
+  userId: number;
+  version: number;
 }
 
-export interface AddTransactionModalProps {
-  visible: boolean;
-  onClose: () => void;
-  onSave: (transaction: Transaction) => void;
+export type RootStackParamList = {
+  Login: undefined;
+  Register: undefined;
+  Dashboard: undefined;
+};
+
+declare global {
+  namespace ReactNavigation {
+    interface RootParamList extends RootStackParamList {}
+  }
+}
+
+export interface Pageable {
+  offset: number;
+  pageNumber: number;
+  pageSize: number;
+  paged: boolean;
+  sort: Sort;
+  unpaged: boolean;
+}
+
+export interface Sort {
+  empty: boolean;
+  sorted: boolean;
+  unsorted: boolean;
 }

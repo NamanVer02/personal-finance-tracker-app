@@ -3,161 +3,251 @@ import { Octicons } from '@expo/vector-icons';
 import { useUser } from 'contexts/UserContext';
 import { ActivityIndicator } from 'react-native';
 import AddTransactionModal from 'components/modals/AddTransactionModal';
-import { useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
+import { fetchTransactions } from 'services/transactionService';
+import { Transaction } from 'interfaces/types';
+import { TransactionResponseDTO } from 'interfaces/dto';
+import { Swipeable, GestureHandlerRootView } from 'react-native-gesture-handler';
+import EditTransactionModal from 'components/modals/EditTransactionModal';
 
 export default function Dashboard() {
   const { user } = useUser();
+  const swipeableRefs = useRef<{ [key: number]: Swipeable | null }>({});
 
   const [addTransactionModalVisible, setAddTransactionModalVisible] = useState(false);
+  const [editTransactionModalVisible, setEditTransactionModalVisible] = useState(false);
+  const [deleteTransactionModalVisible, setDeleteTransactionModalVisible] = useState(false);
+  const [transactions, setTransactions] = useState<TransactionResponseDTO | null>(null);
+  const [transactionToEdit, setTransactionToEdit] = useState<Transaction | null>(null);
+  const [swipedId, setSwipedId] = useState<number | null>(null);
 
   const handleSaveTransaction = () => {
-    console.log("Saved transaction");
-  }
+    console.log('Saved transaction');
+  };
+
+  const handleSyncData = async () => {
+    const response = await fetchTransactions();
+    setTransactions(response);
+  };
+
+  const handleEditTransaction = async (transaction: Transaction) => {
+    setTransactionToEdit(transaction);
+    setEditTransactionModalVisible(true);
+    setSwipedId(transaction.id);
+
+    console.log('Edit transaction');
+  };
+
+  const handleDeleteTransaction = async (transaction: Transaction) => {
+    console.log('Delete transaction');
+  };
+
+  const renderLeftActions = () => (
+    <TouchableOpacity className="flex-1 flex-row items-center pl-6">
+      <Octicons name="pencil" size={20} color="#3B82F6" />
+      <Text className="text-md ml-2 font-bold text-blue-900">Edit</Text>
+    </TouchableOpacity>
+  );
+
+  const renderRightActions = () => (
+    <TouchableOpacity className="flex-1 flex-row-reverse items-center pr-6">
+      <Octicons name="trash" size={20} color="#EF4444" />
+      <Text className="text-md mr-2 font-bold text-red-900">Delete</Text>
+    </TouchableOpacity>
+  );
+
+  // Fetch transactions when the component mounts
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetchTransactions();
+        setTransactions(response);
+      } catch (error) {
+        console.error('Error fetching transactions:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   if (!user) {
-      return (
-        <View className="flex-1 justify-center items-center">
-          <ActivityIndicator size="large" color="#8b5cf6" />
-        </View>
-      );
-    }
+    return (
+      <View className="flex-1 items-center justify-center">
+        <ActivityIndicator size="large" color="#8b5cf6" />
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
-
-      // <AddTransactionModal
+      <AddTransactionModal
         visible={addTransactionModalVisible}
         onClose={() => setAddTransactionModalVisible(false)}
         onSave={handleSaveTransaction}
       />
 
+      <EditTransactionModal
+        visible={editTransactionModalVisible}
+        onClose={() => {
+          setEditTransactionModalVisible(false);
+          if (swipedId !== null && swipeableRefs.current[swipedId]) {
+            swipeableRefs.current[swipedId]?.close();
+            setSwipedId(null);
+          }
+        }}
+        onEdit={handleEditTransaction}
+        onSave={handleSaveTransaction}
+        transactionToEdit={transactionToEdit}
+      />
+
       <StatusBar barStyle="dark-content" backgroundColor="#f9fafb" />
       <ScrollView className="flex-1 p-4">
-
         {/* Header */}
-        <View className="flex-row justify-between items-center px-4 pt-2 pb-8">
+        <View className="flex-row items-center justify-between px-4 pb-8 pt-2">
           <View>
-            <Text className="text-text-light text-sm">Welcome back</Text>
-            <Text className="text-text text-3xl font-bold">{user.username}</Text>
+            <Text className="text-sm text-text-light">Welcome back</Text>
+            <Text className="text-3xl font-bold text-text">{user.username}</Text>
           </View>
-          <TouchableOpacity className="w-10 h-10 bg-gray-100 rounded-full items-center justify-center">
+          <TouchableOpacity className="h-10 w-10 items-center justify-center rounded-full bg-gray-100">
             <Octicons name="bell" size={20} color="#6b7280" />
           </TouchableOpacity>
         </View>
 
         {/* Balance Card */}
-        <View className="mx-4 p-6 bg-purple-500 rounded-2xl shadow-lg">
-        <Text className="text-purple-200 text-base font-medium mb-2">Total Balance</Text>
-        <Text className="text-white text-4xl font-bold mb-6">$8,246.57</Text>
-        <View className="flex-row justify-between">
-          <View className="flex-1 bg-purple-300/50 rounded-xl mr-2 p-4 items-center">
-            <Text className="text-purple-100 text-xs mb-1">Income</Text>
-            <Text className="text-white text-lg font-bold">$12,450.00</Text>
-          </View>
-          <View className="flex-1 bg-purple-300/50 rounded-xl ml-2 p-4 items-center">
-            <Text className="text-purple-100 text-xs mb-1">Expenses</Text>
-            <Text className="text-white text-lg font-bold">$4,203.43</Text>
+        <View className="mx-4 rounded-2xl bg-purple-500 p-6 shadow-lg">
+          <Text className="mb-2 text-base font-medium text-purple-200">Total Balance</Text>
+          <Text className="mb-6 text-4xl font-bold text-white">$8,246.57</Text>
+          <View className="flex-row justify-between">
+            <View className="mr-2 flex-1 items-center rounded-xl bg-purple-300/50 p-4">
+              <Text className="mb-1 text-xs text-purple-100">Income</Text>
+              <Text className="text-lg font-bold text-white">$12,450.00</Text>
+            </View>
+            <View className="ml-2 flex-1 items-center rounded-xl bg-purple-300/50 p-4">
+              <Text className="mb-1 text-xs text-purple-100">Expenses</Text>
+              <Text className="text-lg font-bold text-white">$4,203.43</Text>
+            </View>
           </View>
         </View>
-      </View>
-
 
         {/* Quick Actions */}
-        <View className="flex-row justify-between px-8 mt-10">
-          <TouchableOpacity className="items-center">
-            <View className="w-12 h-12 bg-purple-100 rounded-full items-center justify-center">
-              <Octicons name="paper-airplane" size={20} color="#8b5cf6" />
+        <View className="mt-10 flex-row justify-between px-8">
+          <TouchableOpacity className="items-center" onPress={handleSyncData}>
+            <View className="h-12 w-12 items-center justify-center rounded-full bg-purple-100">
+              <Octicons name="sync" size={20} color="#8b5cf6" />
             </View>
-            <Text className="text-xs mt-1 text-gray-700">Send</Text>
+            <Text className="mt-1 text-xs text-gray-700">Sync</Text>
           </TouchableOpacity>
-          <TouchableOpacity className="items-center" onPress={() => setAddTransactionModalVisible(true)}>
-            <View className="w-12 h-12 bg-purple-100 rounded-full items-center justify-center">
+          <TouchableOpacity
+            className="items-center"
+            onPress={() => setAddTransactionModalVisible(true)}>
+            <View className="h-12 w-12 items-center justify-center rounded-full bg-purple-100">
               <Octicons name="plus" size={20} color="#8b5cf6" />
             </View>
-            <Text className="text-xs mt-1 text-gray-700">Add</Text>
+            <Text className="mt-1 text-xs text-gray-700">Add</Text>
           </TouchableOpacity>
           <TouchableOpacity className="items-center">
-            <View className="w-12 h-12 bg-purple-100 rounded-full items-center justify-center">
+            <View className="h-12 w-12 items-center justify-center rounded-full bg-purple-100">
               <Octicons name="credit-card" size={20} color="#8b5cf6" />
             </View>
-            <Text className="text-xs mt-1 text-gray-700">Cards</Text>
+            <Text className="mt-1 text-xs text-gray-700">Cards</Text>
           </TouchableOpacity>
           <TouchableOpacity className="items-center">
-            <View className="w-12 h-12 bg-purple-100 rounded-full items-center justify-center">
+            <View className="h-12 w-12 items-center justify-center rounded-full bg-purple-100">
               <Octicons name="note" size={20} color="#8b5cf6" />
             </View>
-            <Text className="text-xs mt-1 text-gray-700">Loans</Text>
+            <Text className="mt-1 text-xs text-gray-700">Loans</Text>
           </TouchableOpacity>
         </View>
 
         {/* Recent Transactions */}
-        <View className="mt-14 px-4 mb-20">
-          <View className="flex-row justify-between items-center mb-4">
+        <View className="mb-20 mt-14 px-4">
+          <View className="mb-4 flex-row items-center justify-between">
             <Text className="text-lg font-semibold">Recent Transactions</Text>
             <TouchableOpacity>
               <Text className="text-text">See All</Text>
             </TouchableOpacity>
           </View>
-          
-          {/* Transaction Items */}
-          <View className="bg-white p-4 rounded-xl shadow-sm mb-3">
-            <View className="flex-row items-center">
-              <View className="w-10 h-10 bg-purple-100 rounded-full items-center justify-center mr-3">
-                <Octicons name="credit-card" size={20} color="#8b5cf6" />
-              </View>
-              <View className="flex-1">
-                <Text className="font-medium">Amazon</Text>
-                <Text className="text-xs text-gray-500">May 1, 2025</Text>
-              </View>
-              <Text className="font-semibold text-red-500">-$34.50</Text>
+
+          {/* Transactions List */}
+          <GestureHandlerRootView style={{ flex: 1 }}>
+            <View className="mt-4">
+              {transactions ? (
+                transactions.content.map((item) => (
+                  <Swipeable
+                    key={item.id}
+                    ref={(ref) => {
+                      swipeableRefs.current[item.id] = ref;
+                    }}
+                    leftThreshold={50}
+                    rightThreshold={50}
+                    renderLeftActions={renderLeftActions}
+                    renderRightActions={renderRightActions}
+                    onSwipeableOpen={(direction) => {
+                      if (direction === 'left') {
+                        handleEditTransaction(item);
+                      } else if (direction === 'right') {
+                        handleDeleteTransaction(item);
+                      }
+                    }}>
+                    <View className="mb-3 rounded-xl bg-white p-4 shadow-sm">
+                      <View className="flex-row items-center">
+                        <View className="mr-3 h-10 w-10 items-center justify-center rounded-full bg-purple-100">
+                          <Octicons
+                            name={
+                              item.category === 'Salary'
+                                ? 'briefcase'
+                                : item.category === 'Food & Drinks'
+                                  ? 'flame'
+                                  : 'credit-card'
+                            }
+                            size={20}
+                            color="#8b5cf6"
+                          />
+                        </View>
+                        <View className="flex-1">
+                          <Text className="font-medium">{item.label}</Text>
+                          <Text className="text-xs text-gray-500">
+                            {new Date(item.date).toLocaleDateString('en-US', {
+                              month: 'short',
+                              day: 'numeric',
+                              year: 'numeric',
+                            })}
+                          </Text>
+                        </View>
+                        <Text
+                          className={`font-semibold ${
+                            item.type === 'Expense' ? 'text-red-500' : 'text-green-500'
+                          }`}>
+                          {item.type === 'Expense' ? '-' : '+'}${item.amount}
+                        </Text>
+                      </View>
+                    </View>
+                  </Swipeable>
+                ))
+              ) : (
+                <Text className="mt-8 text-center text-gray-400">No transactions found.</Text>
+              )}
             </View>
-          </View>
-          
-          <View className="bg-white p-4 rounded-xl shadow-sm mb-3">
-            <View className="flex-row items-center">
-              <View className="w-10 h-10 bg-purple-100 rounded-full items-center justify-center mr-3">
-                <Octicons name="paper-airplane" size={20} color="#8b5cf6" />
-              </View>
-              <View className="flex-1">
-                <Text className="font-medium">Transfer to Sarah</Text>
-                <Text className="text-xs text-gray-500">Apr 30, 2025</Text>
-              </View>
-              <Text className="font-semibold text-red-500">-$120.00</Text>
-            </View>
-          </View>
-          
-          <View className="bg-white p-4 rounded-xl shadow-sm">
-            <View className="flex-row items-center">
-              <View className="w-10 h-10 bg-green-100 rounded-full items-center justify-center mr-3">
-                <Octicons name="arrow-down" size={20} color="#10b981" />
-              </View>
-              <View className="flex-1">
-                <Text className="font-medium">Salary Deposit</Text>
-                <Text className="text-xs text-gray-500">Apr 28, 2025</Text>
-              </View>
-              <Text className="font-semibold text-green-500">+$2,450.00</Text>
-            </View>
-          </View>
+          </GestureHandlerRootView>
         </View>
       </ScrollView>
-
       {/* Bottom Navigation */}
-      <View className="absolute bottom-0 left-0 right-0 flex-row justify-around items-center bg-white pt-2 pb-6 border-t border-gray-200">
+      <View className="absolute bottom-0 left-0 right-0 flex-row items-center justify-around border-t border-gray-200 bg-white pb-6 pt-2">
         <TouchableOpacity className="items-center">
           <Octicons name="home" size={24} color="#8b5cf6" />
-          <Text className="text-xs mt-1 text-purple-500">Home</Text>
+          <Text className="mt-1 text-xs text-purple-500">Home</Text>
         </TouchableOpacity>
         <TouchableOpacity className="items-center">
           <Octicons name="graph" size={24} color="#9ca3af" />
-          <Text className="text-xs mt-1 text-gray-400">Stats</Text>
+          <Text className="mt-1 text-xs text-gray-400">Stats</Text>
         </TouchableOpacity>
         <TouchableOpacity className="items-center">
           <Octicons name="credit-card" size={24} color="#9ca3af" />
-          <Text className="text-xs mt-1 text-gray-400">Cards</Text>
+          <Text className="mt-1 text-xs text-gray-400">Cards</Text>
         </TouchableOpacity>
         <TouchableOpacity className="items-center">
           <Octicons name="person" size={24} color="#9ca3af" />
-          <Text className="text-xs mt-1 text-gray-400">Profile</Text>
+          <Text className="mt-1 text-xs text-gray-400">Profile</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
