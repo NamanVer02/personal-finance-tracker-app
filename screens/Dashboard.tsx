@@ -10,6 +10,7 @@ import { TransactionResponseDTO } from 'interfaces/dto';
 import { Swipeable, GestureHandlerRootView } from 'react-native-gesture-handler';
 import EditTransactionModal from 'components/modals/EditTransactionModal';
 import DeleteTransactionModal from 'components/modals/DeleteTransactionModal';
+import { deleteTransaction } from 'services/transactionService';
 
 export default function Dashboard() {
   const { user } = useUser();
@@ -23,8 +24,17 @@ export default function Dashboard() {
   const [transactionToDelete, setTransactionToDelete] = useState<Transaction | null>(null);
   const [swipedId, setSwipedId] = useState<number | null>(null);
 
-  const handleSaveTransaction = () => {
-    console.log('Saved transaction');
+  const handleSaveTransaction = (transaction: Transaction) => {
+    setTransactions((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        content: [transaction, ...prev.content],
+        totalElements: prev.totalElements + 1,
+        numberOfElements: prev.numberOfElements + 1,
+        empty: false,
+      };
+    });
   };
 
   const handleSyncData = async () => {
@@ -45,12 +55,20 @@ export default function Dashboard() {
   };
 
 
-  const handleDeleteTransaction = (transaction: Transaction) => {
-    setTransactionToDelete(transaction);
-    setDeleteTransactionModalVisible(true);
-    setSwipedId(transaction.id);
-
-    console.log('Delete transaction');
+  const handleDeleteTransaction = async (transaction: Transaction) => {
+    try {
+      await deleteTransaction(transaction.id);
+      
+      setTransactions((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          content: prev.content.filter((tx) => tx.id !== transaction.id),
+        };
+      });
+    } catch (error) {
+      alert('Failed to delete transaction. Please try again.');
+    }
   };
 
   const renderLeftActions = () => (
@@ -212,7 +230,9 @@ export default function Dashboard() {
                         setEditTransactionModalVisible(true);
                         setSwipedId(item.id);
                       } else if (direction === 'right') {
-                        handleDeleteTransaction(item);
+                        setTransactionToDelete(item);
+                        setDeleteTransactionModalVisible(true);
+                        setSwipedId(item.id);
                       }
                     }}>
                     <View className="mb-3 rounded-xl bg-white p-4 shadow-sm">
@@ -257,23 +277,36 @@ export default function Dashboard() {
           </GestureHandlerRootView>
         </View>
       </ScrollView>
+
+
       {/* Bottom Navigation */}
-      <View className="absolute bottom-0 left-0 right-0 flex-row items-center justify-around border-t border-gray-200 bg-white pb-6 pt-2">
+      <View className="absolute bottom-6 left-4 right-4 flex-row items-center justify-around rounded-full border border-gray-200 bg-white py-4 shadow-xl">
+        {/* Home (active) */}
         <TouchableOpacity className="items-center">
-          <Octicons name="home" size={24} color="#8b5cf6" />
-          <Text className="mt-1 text-xs text-purple-500">Home</Text>
+          <View className="rounded-full bg-purple-100 p-4">
+            <Octicons name="home" size={24} color="#8b5cf6" />
+          </View>
         </TouchableOpacity>
+
+        {/* Stats */}
         <TouchableOpacity className="items-center">
-          <Octicons name="graph" size={24} color="#9ca3af" />
-          <Text className="mt-1 text-xs text-gray-400">Stats</Text>
+          <View className="p-3">
+            <Octicons name="graph" size={24} color="#9ca3af" />
+          </View>
         </TouchableOpacity>
+
+        {/* Cards */}
         <TouchableOpacity className="items-center">
-          <Octicons name="credit-card" size={24} color="#9ca3af" />
-          <Text className="mt-1 text-xs text-gray-400">Cards</Text>
+          <View className="p-3">
+            <Octicons name="credit-card" size={24} color="#9ca3af" />
+          </View>
         </TouchableOpacity>
+
+        {/* Profile */}
         <TouchableOpacity className="items-center">
-          <Octicons name="person" size={24} color="#9ca3af" />
-          <Text className="mt-1 text-xs text-gray-400">Profile</Text>
+          <View className="p-3">
+            <Octicons name="person" size={24} color="#9ca3af" />
+          </View>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

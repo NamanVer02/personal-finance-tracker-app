@@ -9,7 +9,7 @@ import { ActivityIndicator, View } from "react-native";
 import Login from "screens/Login";
 import Register from "screens/Register";
 import Dashboard from "screens/Dashboard";
-import type { RootStackParamList } from "./navigation/types";
+import type { RootStackParamList } from "./interfaces/types";
 import { UserProvider, useUser } from "./contexts/UserContext";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();

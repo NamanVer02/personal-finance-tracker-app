@@ -49,3 +49,14 @@ export const updateTransaction = async (transactionId: number, transaction: Tran
         throw error;
     }
 }
+
+
+export const deleteTransaction = async (transactionId: number) => {
+    try {
+        const response = await apiClient.delete(`/api/delete/${transactionId}`);
+        return response.data;
+    } catch (error) {
+        console.error("Error deleting transaction:", error);
+        throw error;
+    }
+}

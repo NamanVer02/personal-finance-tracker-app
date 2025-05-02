@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { Octicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { Category, Transaction } from 'interfaces/types';
+import { Category } from 'interfaces/types';
 import { AddTransactionModalProps } from 'interfaces/props';
 import { addTransaction } from 'services/transactionService';
 import { TransactionDTO } from 'interfaces/dto';
@@ -47,9 +47,8 @@ const AddTransactionModal: React.FC<AddTransactionModalProps> = ({ visible, onCl
 
   const currentCategories = transactionType === 'Expense' ? expenseCategories : incomeCategories;
 
-  const handleSave = (): void => {
+  const handleSave = async () => {
     if (!label || !amount || !category) {
-      // Validate fields
       alert('Please fill all required fields');
       return;
     }
@@ -62,7 +61,13 @@ const AddTransactionModal: React.FC<AddTransactionModalProps> = ({ visible, onCl
       date: date.toISOString().split('T')[0],
     };
 
-    addTransaction(transaction);
+    try {
+      const createdTransaction = await addTransaction(transaction);
+      onSave(createdTransaction);
+    } catch (error) {
+      console.error('Error saving transaction:', error);
+      alert('Failed to save transaction. Please try again.');
+    }
 
     // Reset form
     setTransactionType('Expense');
