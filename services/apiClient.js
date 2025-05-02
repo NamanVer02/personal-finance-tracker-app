@@ -1,5 +1,5 @@
 import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
 
 const apiClient = axios.create({
   baseURL: 'http://192.168.127.180:8080',
@@ -14,7 +14,7 @@ apiClient.interceptors.request.use(
       return config;
     }
     // Attach Authorization token if available
-    const token = await AsyncStorage.getItem('accessToken');
+    const token = await SecureStore.getItem('accessToken');
     if (token) {
       config.headers = config.headers || {};
       config.headers.Authorization = `Bearer ${token}`;

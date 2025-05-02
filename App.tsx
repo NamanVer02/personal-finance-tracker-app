@@ -30,9 +30,8 @@ function AppLoader() {
   }, []);
 
   if (loading) {
-    // You can use your own splash or loading component here
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <View className="flex-1 items-center justify-center">
         <ActivityIndicator size="large" color="#8b5cf6" />
       </View>
     );
@@ -40,7 +39,7 @@ function AppLoader() {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Dashboard" screenOptions={{ headerShown: false }}>
+      <Stack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Register" component={Register} />
         <Stack.Screen name="Dashboard" component={Dashboard} />

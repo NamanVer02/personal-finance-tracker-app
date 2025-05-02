@@ -16,16 +16,6 @@ export interface LoginResponseDTO {
     profileImage: string
 }
 
-export interface User {
-    id: string,
-    username: string,
-    email: string,
-    roles: string[],
-    twoFactorRequired: boolean,
-    profileImage: string,
-    tokenType: string
-}
-
 export interface RegisterRequestDTO {
     username: string,
     email: string,
@@ -42,4 +32,12 @@ export interface RegisterResponseDTO {
 export interface TwoFactorSetupResponse {
     secret: string,
     qrCodeBase64: string
+}
+
+export interface AddTransactionDTO {
+    type: 'Expense' | 'Income',
+    label: string,
+    amount: number,
+    category: string,
+    date: string
 }

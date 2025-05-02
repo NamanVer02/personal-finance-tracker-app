@@ -15,9 +15,11 @@ import { useColorScheme } from "nativewind";
 import { CommonActions, useNavigation } from "@react-navigation/native";
 import { login } from "services/authService";
 import { LoginRequestDTO } from "interfaces/dto";
+import { useUser } from "contexts/UserContext";
 
 export default function Login() {
   const navigation = useNavigation();
+  const { setUser } = useUser();
 
   const { colorScheme } = useColorScheme();
   const [username, setUsername] = useState("");
@@ -36,6 +38,7 @@ export default function Login() {
     const result = await login(loginRequest);
 
     if (result.ok) {
+      await setUser(result.user ?? null);
       navigation.dispatch(
         CommonActions.reset({
           index: 0,

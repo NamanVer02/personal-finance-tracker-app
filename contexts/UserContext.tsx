@@ -1,33 +1,35 @@
+import * as SecureStore from 'expo-secure-store';
 import React, { createContext, useState, useContext, ReactNode } from 'react';
-import type { User } from '../interfaces/dto';
+import type { User } from '../interfaces/types';
 
-// Define the context type
 interface UserContextType {
   user: User | null;
-  setUser: (user: User | null) => void;
+  setUser: (user: User | null) => Promise<void>;
 }
 
-// Create the context with a default value
 const UserContext = createContext<UserContextType>({
   user: null,
-  setUser: () => {},
+  setUser: async () => {},
 });
 
-// Custom hook for easier usage
 export const useUser = () => useContext(UserContext);
 
-// UserProvider props type includes children
 interface UserProviderProps {
   children: ReactNode;
 }
 
-// UserProvider component
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUserState] = useState<User | null>(null);
 
-  return (
-    <UserContext.Provider value={{ user, setUser }}>
-      {children}
-    </UserContext.Provider>
-  );
+  // setUser both updates state and persists to SecureStore
+  const setUser = async (user: User | null) => {
+    setUserState(user);
+    if (user) {
+      await SecureStore.setItemAsync('user', JSON.stringify(user));
+    } else {
+      await SecureStore.deleteItemAsync('user');
+    }
+  };
+
+  return <UserContext.Provider value={{ user, setUser }}>{children}</UserContext.Provider>;
 };

@@ -1,18 +1,36 @@
 import { SafeAreaView, ScrollView, StatusBar, Text, TouchableOpacity, View } from 'react-native';
 import { Octicons } from '@expo/vector-icons';
-import * as SecureStore from 'expo-secure-store';
-import { User } from 'interfaces/dto';
 import { useUser } from 'contexts/UserContext';
+import { ActivityIndicator } from 'react-native';
+import AddTransactionModal from 'components/modals/AddTransactionModal';
+import { useState } from 'react';
 
 export default function Dashboard() {
   const { user } = useUser();
 
-  if (!user) {
-    return <Text>Loading user...</Text>;
+  const [addTransactionModalVisible, setAddTransactionModalVisible] = useState(false);
+
+  const handleSaveTransaction = () => {
+    console.log("Saved transaction");
   }
+
+  if (!user) {
+      return (
+        <View className="flex-1 justify-center items-center">
+          <ActivityIndicator size="large" color="#8b5cf6" />
+        </View>
+      );
+    }
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
+
+      // <AddTransactionModal
+        visible={addTransactionModalVisible}
+        onClose={() => setAddTransactionModalVisible(false)}
+        onSave={handleSaveTransaction}
+      />
+
       <StatusBar barStyle="dark-content" backgroundColor="#f9fafb" />
       <ScrollView className="flex-1 p-4">
 
@@ -52,7 +70,7 @@ export default function Dashboard() {
             </View>
             <Text className="text-xs mt-1 text-gray-700">Send</Text>
           </TouchableOpacity>
-          <TouchableOpacity className="items-center">
+          <TouchableOpacity className="items-center" onPress={() => setAddTransactionModalVisible(true)}>
             <View className="w-12 h-12 bg-purple-100 rounded-full items-center justify-center">
               <Octicons name="plus" size={20} color="#8b5cf6" />
             </View>

@@ -1,7 +1,8 @@
 import apiClient from './apiClient';
 import * as SecureStore from 'expo-secure-store';
 import { Alert } from 'react-native';
-import { LoginRequestDTO, LoginResponseDTO, RegisterRequestDTO, RegisterResponseDTO, User } from '../interfaces/dto';
+import { LoginRequestDTO, LoginResponseDTO, RegisterRequestDTO, RegisterResponseDTO } from '../interfaces/dto';
+import { User } from '../interfaces/types';
 
 export const login = async (loginRequest: LoginRequestDTO) => {
   try {
@@ -35,6 +36,8 @@ export const login = async (loginRequest: LoginRequestDTO) => {
       tokenType,
     };
 
+    await SecureStore.setItemAsync('accessToken', loginResponse.accessToken);
+    await SecureStore.setItemAsync('refreshToken', loginResponse.refreshToken);
     await SecureStore.setItemAsync('user', JSON.stringify(user));
 
     return {
