@@ -1,5 +1,5 @@
 import apiClient from "./apiClient";
-import { AddTransactionDTO } from "interfaces/dto";
+import { TransactionDTO } from "interfaces/dto";
 
 
 export const fetchTransactions = async () => {
@@ -13,8 +13,8 @@ export const fetchTransactions = async () => {
 }
 
 
-export const addTransaction = async (transaction: AddTransactionDTO) => {
-    const transactionDTO: AddTransactionDTO = {
+export const addTransaction = async (transaction: TransactionDTO) => {
+    const transactionDTO: TransactionDTO = {
         type: transaction.type,
         label: transaction.label,
         amount: transaction.amount,
@@ -29,4 +29,23 @@ export const addTransaction = async (transaction: AddTransactionDTO) => {
     console.error("Error adding transaction:", error);
     throw error;
   }
+}
+
+
+export const updateTransaction = async (transactionId: number, transaction: TransactionDTO) => {
+    const transactionDTO: TransactionDTO = {
+        type: transaction.type,
+        label: transaction.label,
+        amount: transaction.amount,
+        category: transaction.category,
+        date: transaction.date
+    };
+        
+    try {
+        const response = await apiClient.put(`/api/put/${transactionId}`, transactionDTO);
+        return response.data;
+    } catch (error) {
+        console.error("Error updating transaction:", error);
+        throw error;
+    }
 }

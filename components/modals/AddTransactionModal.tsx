@@ -14,7 +14,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { Category, Transaction } from 'interfaces/types';
 import { AddTransactionModalProps } from 'interfaces/props';
 import { addTransaction } from 'services/transactionService';
-import { AddTransactionDTO } from 'interfaces/dto';
+import { TransactionDTO } from 'interfaces/dto';
 
 const AddTransactionModal: React.FC<AddTransactionModalProps> = ({ visible, onClose, onSave }) => {
   const [transactionType, setTransactionType] = useState<'Expense' | 'Income'>('Expense');
@@ -54,7 +54,7 @@ const AddTransactionModal: React.FC<AddTransactionModalProps> = ({ visible, onCl
       return;
     }
 
-    const transaction: AddTransactionDTO = {
+    const transaction: TransactionDTO = {
       type: transactionType,
       label,
       amount: parseFloat(amount),

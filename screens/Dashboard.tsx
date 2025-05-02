@@ -9,6 +9,7 @@ import { Transaction } from 'interfaces/types';
 import { TransactionResponseDTO } from 'interfaces/dto';
 import { Swipeable, GestureHandlerRootView } from 'react-native-gesture-handler';
 import EditTransactionModal from 'components/modals/EditTransactionModal';
+import DeleteTransactionModal from 'components/modals/DeleteTransactionModal';
 
 export default function Dashboard() {
   const { user } = useUser();
@@ -19,6 +20,7 @@ export default function Dashboard() {
   const [deleteTransactionModalVisible, setDeleteTransactionModalVisible] = useState(false);
   const [transactions, setTransactions] = useState<TransactionResponseDTO | null>(null);
   const [transactionToEdit, setTransactionToEdit] = useState<Transaction | null>(null);
+  const [transactionToDelete, setTransactionToDelete] = useState<Transaction | null>(null);
   const [swipedId, setSwipedId] = useState<number | null>(null);
 
   const handleSaveTransaction = () => {
@@ -30,15 +32,24 @@ export default function Dashboard() {
     setTransactions(response);
   };
 
-  const handleEditTransaction = async (transaction: Transaction) => {
-    setTransactionToEdit(transaction);
-    setEditTransactionModalVisible(true);
-    setSwipedId(transaction.id);
-
-    console.log('Edit transaction');
+  const handleEditTransaction = (updatedTransaction: Transaction) => {
+    setTransactions((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        content: prev.content.map((tx) =>
+          tx.id === updatedTransaction.id ? updatedTransaction : tx
+        ),
+      };
+    });
   };
 
-  const handleDeleteTransaction = async (transaction: Transaction) => {
+
+  const handleDeleteTransaction = (transaction: Transaction) => {
+    setTransactionToDelete(transaction);
+    setDeleteTransactionModalVisible(true);
+    setSwipedId(transaction.id);
+
     console.log('Delete transaction');
   };
 
@@ -98,6 +109,19 @@ export default function Dashboard() {
         onEdit={handleEditTransaction}
         onSave={handleSaveTransaction}
         transactionToEdit={transactionToEdit}
+      />
+
+      <DeleteTransactionModal
+        visible={deleteTransactionModalVisible}
+        onClose={() => {
+          setDeleteTransactionModalVisible(false);
+          if (swipedId !== null && swipeableRefs.current[swipedId]) {
+            swipeableRefs.current[swipedId]?.close();
+            setSwipedId(null);
+          }
+        }}
+        onDelete={handleDeleteTransaction}
+        transactionToDelete={transactionToDelete}
       />
 
       <StatusBar barStyle="dark-content" backgroundColor="#f9fafb" />
@@ -184,7 +208,9 @@ export default function Dashboard() {
                     renderRightActions={renderRightActions}
                     onSwipeableOpen={(direction) => {
                       if (direction === 'left') {
-                        handleEditTransaction(item);
+                        setTransactionToEdit(item);
+                        setEditTransactionModalVisible(true);
+                        setSwipedId(item.id);
                       } else if (direction === 'right') {
                         handleDeleteTransaction(item);
                       }

@@ -14,6 +14,8 @@ import { Octicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Category, Transaction } from 'interfaces/types';
 import { AddTransactionModalProps } from 'interfaces/props';
+import { updateTransaction } from 'services/transactionService';
+import { TransactionDTO } from 'interfaces/dto';
 
 interface EditTransactionModalProps extends AddTransactionModalProps {
   transactionToEdit?: Transaction | null;
@@ -88,20 +90,29 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
     setDate(currentDate);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!label || !amount || !category) {
       alert('Please fill all required fields');
       return;
     }
     if (transactionToEdit) {
-      onEdit({
-        ...transactionToEdit,
-        type: transactionType,
-        label,
-        amount: parseFloat(amount),
-        category: category.name,
-        date: date,
-      });
+      try {
+        // Prepare DTO for the API
+        const updatedDTO: TransactionDTO = {
+          type: transactionType,
+          label,
+          amount: parseFloat(amount),
+          category: category.name,
+          date: date.toISOString().split("T")[0],
+        };
+        // Call your update API
+        const updatedTransaction = await updateTransaction(transactionToEdit.id, updatedDTO);
+        // Pass updated transaction to parent
+        onEdit(updatedTransaction);
+      } catch (error) {
+        alert('Failed to update transaction. Please try again.');
+        return;
+      }
     }
     onClose();
   };

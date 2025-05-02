@@ -36,7 +36,7 @@ export interface TwoFactorSetupResponse {
   qrCodeBase64: string;
 }
 
-export interface AddTransactionDTO {
+export interface TransactionDTO {
   type: 'Expense' | 'Income';
   label: string;
   amount: number;
