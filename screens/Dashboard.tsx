@@ -285,37 +285,6 @@ export default function Dashboard() {
           </GestureHandlerRootView>
         </View>
       </ScrollView>
-
-      {/* Bottom Navigation */}
-      <View className="absolute bottom-6 left-4 right-4 flex-row items-center justify-around rounded-full border border-gray-200 bg-white py-4 shadow-xl">
-        {/* Home (active) */}
-        <TouchableOpacity className="items-center">
-          <View className="rounded-full bg-purple-100 p-4">
-            <Octicons name="home" size={24} color="#8b5cf6" />
-          </View>
-        </TouchableOpacity>
-
-        {/* Stats */}
-        <TouchableOpacity className="items-center">
-          <View className="p-3">
-            <Octicons name="graph" size={24} color="#9ca3af" />
-          </View>
-        </TouchableOpacity>
-
-        {/* Cards */}
-        <TouchableOpacity className="items-center">
-          <View className="p-3">
-            <Octicons name="credit-card" size={24} color="#9ca3af" />
-          </View>
-        </TouchableOpacity>
-
-        {/* Profile */}
-        <TouchableOpacity className="items-center">
-          <View className="p-3">
-            <Octicons name="person" size={24} color="#9ca3af" />
-          </View>
-        </TouchableOpacity>
-      </View>
     </SafeAreaView>
   );
 }

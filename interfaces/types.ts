@@ -38,8 +38,15 @@ export interface Transaction {
 export type RootStackParamList = {
   Login: undefined;
   Register: undefined;
+  Main: undefined;
   Dashboard: undefined;
 };
+
+// export type BottomTabParamList = {
+//   Dashboard: undefined;
+//   Profile: undefined;
+//   Settings: undefined;
+// };
 
 declare global {
   namespace ReactNavigation {
