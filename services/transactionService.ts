@@ -1,5 +1,8 @@
 import apiClient from "./apiClient";
 import { TransactionDTO } from "interfaces/dto";
+import * as SecureStore from 'expo-secure-store';
+import { FinanceDetails } from "interfaces/types";
+
 
 
 export const fetchTransactions = async () => {
@@ -59,4 +62,53 @@ export const deleteTransaction = async (transactionId: number) => {
         console.error("Error deleting transaction:", error);
         throw error;
     }
+}
+
+
+export const fetchFinanceDetails = async () => {
+    const userString = await SecureStore.getItemAsync('user');
+    const user = userString ? JSON.parse(userString) : null;
+
+    let incomeResponse = {};
+    let expenseResponse = {};
+
+    try {
+        const response = await apiClient.post(`/api/get/summary/income/${user?.id}`);
+        incomeResponse = response.data;
+    } catch (error) {
+        console.error("Error fetching income details:", error);
+        throw error;
+    }
+
+    try {
+      const response = await apiClient.post(`/api/get/summary/expense/${user?.id}`);
+      expenseResponse = response.data;
+    } catch (error) {
+      console.error('Error fetching expense details:', error);
+      throw error;
+    }
+
+    const total_income = (Object.values(incomeResponse) as number[]).reduce(
+      (sum, amount) => sum + amount,
+      0
+    );
+
+    const total_expense = (Object.values(expenseResponse) as number[]).reduce(
+      (sum, amount) => sum + amount,
+      0
+    );
+
+    const total_balance = total_income - total_expense;
+    const income_by_category = Object.values(incomeResponse) as number[];
+    const expense_by_category = Object.values(expenseResponse) as number[];
+
+    const financeDetails: FinanceDetails = {
+        total_income,
+        total_expense,
+        total_balance,
+        income_by_category,
+        expense_by_category
+    };
+
+    return financeDetails;
 }

@@ -5,12 +5,12 @@ import { ActivityIndicator } from 'react-native';
 import AddTransactionModal from 'components/modals/AddTransactionModal';
 import { useEffect, useState, useRef } from 'react';
 import { fetchTransactions } from 'services/transactionService';
-import { Transaction } from 'interfaces/types';
+import { Transaction, FinanceDetails } from 'interfaces/types';
 import { TransactionResponseDTO } from 'interfaces/dto';
 import { Swipeable, GestureHandlerRootView } from 'react-native-gesture-handler';
 import EditTransactionModal from 'components/modals/EditTransactionModal';
 import DeleteTransactionModal from 'components/modals/DeleteTransactionModal';
-import { deleteTransaction } from 'services/transactionService';
+import { deleteTransaction, fetchFinanceDetails } from 'services/transactionService';
 
 export default function Dashboard() {
   const { user } = useUser();
@@ -20,6 +20,7 @@ export default function Dashboard() {
   const [editTransactionModalVisible, setEditTransactionModalVisible] = useState(false);
   const [deleteTransactionModalVisible, setDeleteTransactionModalVisible] = useState(false);
   const [transactions, setTransactions] = useState<TransactionResponseDTO | null>(null);
+  const [financeDetails, setFinanceDetails] = useState<FinanceDetails | null>(null);
   const [transactionToEdit, setTransactionToEdit] = useState<Transaction | null>(null);
   const [transactionToDelete, setTransactionToDelete] = useState<Transaction | null>(null);
   const [swipedId, setSwipedId] = useState<number | null>(null);
@@ -85,7 +86,7 @@ export default function Dashboard() {
     </TouchableOpacity>
   );
 
-  // Fetch transactions when the component mounts
+  // Fetch data when the component mounts
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -93,6 +94,13 @@ export default function Dashboard() {
         setTransactions(response);
       } catch (error) {
         console.error('Error fetching transactions:', error);
+      }
+
+      try {
+        const response = await fetchFinanceDetails();
+        setFinanceDetails(response);
+      } catch (error) {
+        console.error('Error fetching finance details:', error);
       }
     };
 
@@ -158,15 +166,15 @@ export default function Dashboard() {
         {/* Balance Card */}
         <View className="mx-4 rounded-2xl bg-purple-500 p-6 shadow-lg">
           <Text className="mb-2 text-base font-medium text-purple-200">Total Balance</Text>
-          <Text className="mb-6 text-4xl font-bold text-white">$8,246.57</Text>
+          <Text className="mb-6 text-4xl font-bold text-white">{`$${financeDetails?.total_balance}`}</Text>
           <View className="flex-row justify-between">
             <View className="mr-2 flex-1 items-center rounded-xl bg-purple-300/50 p-4">
               <Text className="mb-1 text-xs text-purple-100">Income</Text>
-              <Text className="text-lg font-bold text-white">$12,450.00</Text>
+              <Text className="text-lg font-bold text-white">{`$${financeDetails?.total_income}`}</Text>
             </View>
             <View className="ml-2 flex-1 items-center rounded-xl bg-purple-300/50 p-4">
               <Text className="mb-1 text-xs text-purple-100">Expenses</Text>
-              <Text className="text-lg font-bold text-white">$4,203.43</Text>
+              <Text className="text-lg font-bold text-white">{`$${financeDetails?.total_expense}`}</Text>
             </View>
           </View>
         </View>
@@ -277,7 +285,6 @@ export default function Dashboard() {
           </GestureHandlerRootView>
         </View>
       </ScrollView>
-
 
       {/* Bottom Navigation */}
       <View className="absolute bottom-6 left-4 right-4 flex-row items-center justify-around rounded-full border border-gray-200 bg-white py-4 shadow-xl">

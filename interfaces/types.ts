@@ -61,3 +61,11 @@ export interface Sort {
   sorted: boolean;
   unsorted: boolean;
 }
+
+export interface FinanceDetails {
+  total_income: number;
+  total_expense: number;
+  total_balance: number;
+  income_by_category: number[];
+  expense_by_category: number[];
+}
