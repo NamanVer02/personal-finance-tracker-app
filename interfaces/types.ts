@@ -44,6 +44,7 @@ export type RootStackParamList = {
     secret: string;
     qrCodeBase64: string;
   };
+  ForgotPassword: undefined;
 };
 
 declare global {

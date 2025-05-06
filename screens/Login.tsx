@@ -146,7 +146,7 @@ export default function Login() {
 
               {/* Secondary Actions */}
               <View className="flex-row justify-between mt-6">
-                <TouchableOpacity>
+                <TouchableOpacity onPress={() => navigation.navigate("ForgotPassword")}>
                   <Text className="text-accent font-medium text-base">
                     Forgot Password?
                   </Text>

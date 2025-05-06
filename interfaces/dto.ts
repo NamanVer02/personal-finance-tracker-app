@@ -62,3 +62,9 @@ export interface UpdatePasswordRequestDTO {
   currentPassword: string;
   newPassword: string;
 }
+
+export interface ForgotPasswordRequestDTO {
+  username: string;
+  twoFactorCode: number;
+  newPassword: string;
+}
