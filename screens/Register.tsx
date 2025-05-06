@@ -43,8 +43,11 @@ export default function Register() {
         }
 
         const result = await register(registerRequest);
-        if (result.ok) {
-            navigation.navigate("Login");
+        if (result.ok && result.twoFactorResponse) {
+            navigation.navigate("GoogleAuthSetup", {
+                secret: result.twoFactorResponse.secret,
+                qrCodeBase64: result.twoFactorResponse.qrCodeBase64,
+            });
         }
     };
 

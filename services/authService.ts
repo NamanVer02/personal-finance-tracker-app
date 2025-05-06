@@ -94,10 +94,15 @@ export const register = async (registerRequest: RegisterRequestDTO) => {
       { headers: { skipAuth: true, 'Content-Type': 'multipart/form-data' } }
     );
 
-    const registerResponse: RegisterResponseDTO = response.data
+    const registerResponse: RegisterResponseDTO = {
+      message: response.data.message,
+      twoFactorSetupResponse: response.data.twoFactorSetup
+    }
 
     return {
-      ok: true
+      ok: true,
+      message: registerResponse.message,
+      twoFactorResponse: registerResponse.twoFactorSetupResponse
     }
   } catch (error: unknown) {
     let message = 'Registeration failed. Please try again.';

@@ -15,6 +15,7 @@ import TabBar from './components/ui/TabBar';
 import type { RootStackParamList } from './interfaces/types';
 import { UserProvider, useUser } from './contexts/UserContext';
 import Analytics from 'screens/Analytics';
+import GoogleAuthSetup from 'screens/GoogleAuthSetup';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const BottomTab = createBottomTabNavigator();
@@ -60,6 +61,7 @@ function AppLoader() {
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Register" component={Register} />
+        <Stack.Screen name="GoogleAuthSetup" component={GoogleAuthSetup} />
         <Stack.Screen name="Main" component={BottomTabNavigator} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>

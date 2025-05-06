@@ -40,6 +40,10 @@ export type RootStackParamList = {
   Register: undefined;
   Main: undefined;
   Dashboard: undefined;
+  GoogleAuthSetup: {
+    secret: string;
+    qrCodeBase64: string;
+  };
 };
 
 declare global {
@@ -70,3 +74,8 @@ export interface FinanceDetails {
   income_by_category: number[];
   expense_by_category: number[];
 }
+
+export type GoogleAuthSetupProps = {
+  qrCodeBase64: string;
+  secret: string;
+};
