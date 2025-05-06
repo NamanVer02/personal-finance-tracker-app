@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { Octicons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { GoogleAuthSetupProps } from 'interfaces/types';
+import { GoogleAuthSetupProps } from 'interfaces/props';
 
 
 

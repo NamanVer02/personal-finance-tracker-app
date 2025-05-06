@@ -74,8 +74,3 @@ export interface FinanceDetails {
   income_by_category: number[];
   expense_by_category: number[];
 }
-
-export type GoogleAuthSetupProps = {
-  qrCodeBase64: string;
-  secret: string;
-};

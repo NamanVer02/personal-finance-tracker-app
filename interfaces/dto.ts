@@ -57,3 +57,8 @@ export interface TransactionResponseDTO {
   totalElements: number;
   totalPages: number;
 }
+
+export interface UpdatePasswordRequestDTO {
+  currentPassword: string;
+  newPassword: string;
+}

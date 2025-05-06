@@ -14,12 +14,14 @@ import { ActivityIndicator } from 'react-native';
 import { logout } from 'services/authService';
 import { User } from 'interfaces/types';
 import { useNavigation } from '@react-navigation/native';
+import UpdatePasswordModal from 'components/modals/UpdatePasswordModal';
 
 export default function Profile() {
   const navigation = useNavigation();
 
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isPasswordModalVisible, setIsPasswordModalVisible] = useState(false);
 
   
   const handleLogout = async () => {
@@ -72,11 +74,17 @@ export default function Profile() {
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
+
+      <UpdatePasswordModal
+        visible={isPasswordModalVisible}
+        onClose={() => setIsPasswordModalVisible(false)}
+      />
+
       <StatusBar barStyle="dark-content" backgroundColor="#f9fafb" />
       <ScrollView className="flex-1 p-4">
         {/* Header */}
         <View className="flex-row items-center justify-between px-1">
-          <TouchableOpacity className="p-2">
+          <TouchableOpacity className="p-2" onPress={() => navigation.goBack()}>
             <Octicons name="arrow-left" size={24} color="#6b7280" />
           </TouchableOpacity>
           <Text className="text-xl font-bold text-gray-800">Profile</Text>
@@ -128,11 +136,11 @@ export default function Profile() {
             <Octicons name="chevron-right" size={20} color="#6b7280" />
           </TouchableOpacity>
 
-          <TouchableOpacity className="flex-row items-center border-b border-gray-100 py-4">
+          <TouchableOpacity className="flex-row items-center border-b border-gray-100 py-4" onPress={() => setIsPasswordModalVisible(true)}>
             <View className="mr-4 h-10 w-10 items-center justify-center rounded-full bg-purple-100">
               <Octicons name="shield-lock" size={20} color="#8b5cf6" />
             </View>
-            <Text className="flex-1 text-base text-gray-600">Security</Text>
+            <Text className="flex-1 text-base text-gray-600">Update Password</Text>
             <Octicons name="chevron-right" size={20} color="#6b7280" />
           </TouchableOpacity>
 
