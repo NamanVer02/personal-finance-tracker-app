@@ -40,7 +40,9 @@ export default function Dashboard() {
 
   const handleSyncData = async () => {
     const response = await fetchTransactions();
+    const response2 = await fetchFinanceDetails();
     setTransactions(response);
+    setFinanceDetails(response2);
   };
 
   const handleEditTransaction = (updatedTransaction: Transaction) => {

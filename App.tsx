@@ -58,18 +58,9 @@ function AppLoader() {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {!user || !user.id ? (
-          <>
-            <Stack.Screen name="Login" component={Login} />
-            <Stack.Screen name="Register" component={Register} />
-          </>
-        ) : (
-          <Stack.Screen
-            name="Main"
-            component={BottomTabNavigator}
-            options={{ headerShown: false }}
-          />
-        )}
+        <Stack.Screen name="Login" component={Login} />
+        <Stack.Screen name="Register" component={Register} />
+        <Stack.Screen name="Main" component={BottomTabNavigator} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

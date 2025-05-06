@@ -42,12 +42,6 @@ export type RootStackParamList = {
   Dashboard: undefined;
 };
 
-// export type BottomTabParamList = {
-//   Dashboard: undefined;
-//   Profile: undefined;
-//   Settings: undefined;
-// };
-
 declare global {
   namespace ReactNavigation {
     interface RootParamList extends RootStackParamList {}

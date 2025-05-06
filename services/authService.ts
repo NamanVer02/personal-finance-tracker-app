@@ -122,3 +122,34 @@ export const register = async (registerRequest: RegisterRequestDTO) => {
     return { ok: false, error: message };
   }
 }
+
+
+export const logout = async () => {
+  try {
+    const response = await apiClient.post('/api/auth/logout');
+
+    const logoutResponse = response.data;
+    if (logoutResponse.error) {
+      Alert.alert('Logout Error', logoutResponse.error);
+      return {ok: false, error: logoutResponse.error};
+    }
+
+    await SecureStore.deleteItemAsync('accessToken');
+    await SecureStore.deleteItemAsync('refreshToken');
+    await SecureStore.deleteItemAsync('user');
+
+    console.log('Logout successful:', logoutResponse);
+
+    return {
+      ok: true,
+    }
+  } catch (error) {
+    console.error('Error during logout:', error); 
+    Alert.alert('Logout Error', 'Logout failed. Please try again.');
+
+    return {
+      ok: false,
+      error: 'Logout failed. Please try again.',
+    }
+  }
+};
