@@ -1,4 +1,4 @@
-import { SafeAreaView, ScrollView, StatusBar, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView, ScrollView, StatusBar, Text, TouchableOpacity, View, Image } from 'react-native';
 import { Octicons } from '@expo/vector-icons';
 import { useUser } from 'contexts/UserContext';
 import { ActivityIndicator } from 'react-native';
@@ -156,9 +156,26 @@ export default function Dashboard() {
       <ScrollView className="flex-1 p-4">
         {/* Header */}
         <View className="flex-row items-center justify-between px-4 pb-8 pt-2">
-          <View>
-            <Text className="text-sm text-text-light">Welcome back</Text>
-            <Text className="text-3xl font-bold text-text">{user.username}</Text>
+          <View className="flex-row items-center">
+            <View className="mr-3 h-12 w-12 overflow-hidden rounded-full border border-gray-200">
+              {user.profileImage ? (
+                <Image
+                  source={{ uri: `data:image/png;base64,${user.profileImage}` }}
+                  className="h-full w-full"
+                  resizeMode="cover"
+                />
+              ) : (
+                <View className="h-full w-full items-center justify-center bg-accent">
+                  <Text className="font-bold text-white">
+                    {user.username.substring(0, 2).toUpperCase()}
+                  </Text>
+                </View>
+              )}
+            </View>
+            <View>
+              <Text className="text-sm text-text-light">Welcome back</Text>
+              <Text className="text-3xl font-bold text-text">{user.username}</Text>
+            </View>
           </View>
           <TouchableOpacity className="h-10 w-10 items-center justify-center rounded-full bg-gray-100">
             <Octicons name="bell" size={20} color="#6b7280" />

@@ -18,7 +18,6 @@ apiClient.interceptors.request.use(
     if (token) {
       config.headers = config.headers || {};
       config.headers.Authorization = `Bearer ${token}`;
-      console.log('Token attached:', token);
     }
     // If Content-Type is not set, default to application/json
     if (!config.headers || !config.headers['Content-Type']) {
