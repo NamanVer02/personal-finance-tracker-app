@@ -65,14 +65,6 @@ export default function FinancialAnalysisScreen() {
     [filters, fetchFinanceData]
   );
 
-  const handleApplyFilters = useCallback(
-    (newFilters: FilterParams) => {
-      setFilters(newFilters);
-      fetchFinanceData(newFilters);
-    },
-    [fetchFinanceData]
-  );
-
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     fetchFinanceData(filters).finally(() => setRefreshing(false));
@@ -114,7 +106,7 @@ export default function FinancialAnalysisScreen() {
 
   const renderSummaryCards = () => (
     <View className="mb-6 flex-row justify-between px-4">
-      <View className="w-[47%] rounded-xl bg-white p-4 shadow-sm">
+      <View className="w-[47%] rounded-xl bg-white p-4 ">
         <View className="mb-2 h-8 w-8 items-center justify-center rounded-full bg-green-100">
           <Octicons name="arrow-down" size={16} color="#10b981" />
         </View>
@@ -124,7 +116,7 @@ export default function FinancialAnalysisScreen() {
         </Text>
       </View>
 
-      <View className="w-[47%] rounded-xl bg-white p-4 shadow-sm">
+      <View className="w-[47%] rounded-xl bg-white p-4 ">
         <View className="mb-2 h-8 w-8 items-center justify-center rounded-full bg-red-100">
           <Octicons name="arrow-up" size={16} color="#ef4444" />
         </View>
@@ -157,7 +149,7 @@ export default function FinancialAnalysisScreen() {
     };
 
     return (
-      <View className="mx-4 mb-6 rounded-xl bg-white p-4 shadow-sm">
+      <View className="mx-4 mb-6 rounded-xl bg-white p-4">
         <Text className="mb-4 text-lg font-semibold">Income vs Expenses</Text>
         <BarChart
           data={chartData}
@@ -202,7 +194,7 @@ export default function FinancialAnalysisScreen() {
     });
 
     return (
-      <View className="mx-4 mb-6 rounded-xl bg-white p-4 shadow-sm">
+      <View className="mx-4 mb-6 rounded-xl bg-white p-4 ">
         <Text className="mb-4 text-lg font-semibold">Spending by Category</Text>
         <PieChart
           data={pieData}

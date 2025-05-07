@@ -11,6 +11,8 @@ import { Swipeable, GestureHandlerRootView } from 'react-native-gesture-handler'
 import EditTransactionModal from 'components/modals/EditTransactionModal';
 import DeleteTransactionModal from 'components/modals/DeleteTransactionModal';
 import { deleteTransaction, fetchFinanceDetails } from 'services/transactionService';
+import { colorScheme } from 'nativewind';
+import ThemeToggle from 'components/ui/theme-toggle';
 
 export default function Dashboard() {
   const { user } = useUser();
@@ -214,12 +216,7 @@ export default function Dashboard() {
             </View>
             <Text className="mt-1 text-xs text-gray-700">Add</Text>
           </TouchableOpacity>
-          <TouchableOpacity className="items-center">
-            <View className="h-12 w-12 items-center justify-center rounded-full bg-purple-100">
-              <Octicons name="credit-card" size={20} color="#8b5cf6" />
-            </View>
-            <Text className="mt-1 text-xs text-gray-700">Cards</Text>
-          </TouchableOpacity>
+          <ThemeToggle compact></ThemeToggle>
           <TouchableOpacity className="items-center">
             <View className="h-12 w-12 items-center justify-center rounded-full bg-purple-100">
               <Octicons name="note" size={20} color="#8b5cf6" />
@@ -262,7 +259,7 @@ export default function Dashboard() {
                         setSwipedId(item.id);
                       }
                     }}>
-                    <View className="mb-3 rounded-xl bg-white p-4 shadow-sm">
+                    <View className="mb-3 rounded-xl bg-white p-4">
                       <View className="flex-row items-center">
                         <View className="mr-3 h-10 w-10 items-center justify-center rounded-full bg-purple-100">
                           <Octicons

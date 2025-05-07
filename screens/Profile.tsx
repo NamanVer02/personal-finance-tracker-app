@@ -104,9 +104,6 @@ export default function Profile() {
               </Text>
             </View>
           )}
-          <TouchableOpacity className="border-3 absolute bottom-1 right-1 h-9 w-9 items-center justify-center rounded-full border-white bg-purple-500">
-            <Octicons name="pencil" size={16} color="#ffffff" />
-          </TouchableOpacity>
         </View>
 
         <Text className="mt-4 text-center text-2xl font-bold text-gray-800">{user.username}</Text>
@@ -122,7 +119,7 @@ export default function Profile() {
         </View>
 
         {/* Account Settings Section */}
-        <View className="mx-6 mt-8 rounded-2xl bg-white p-4 shadow-sm">
+        <View className="mx-6 mt-8 rounded-2xl bg-white p-4 ">
           <Text className="mb-4 text-lg font-semibold text-gray-800">Account Settings</Text>
 
           <TouchableOpacity className="flex-row items-center border-b border-gray-100 py-4">
@@ -134,7 +131,7 @@ export default function Profile() {
           </TouchableOpacity>
 
           <TouchableOpacity
-            className="flex-row items-center border-b border-gray-100 py-4"
+            className="flex-row items-center py-4"
             onPress={() => setIsPasswordModalVisible(true)}>
             <View className="mr-4 h-10 w-10 items-center justify-center rounded-full bg-purple-100">
               <Octicons name="shield-lock" size={20} color="#8b5cf6" />
@@ -165,7 +162,7 @@ export default function Profile() {
         </View>
 
         {/* Preferences Section */}
-        {/* <View className="mt-6 mx-6 rounded-2xl bg-white p-4 shadow-sm">
+        {/* <View className="mt-6 mx-6 rounded-2xl bg-white p-4 ">
           <Text className="mb-4 text-lg font-semibold text-gray-800">Preferences</Text>
 
           <TouchableOpacity className="flex-row items-center border-b border-gray-100 py-4">
