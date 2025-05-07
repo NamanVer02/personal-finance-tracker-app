@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -7,19 +7,21 @@ import {
   TouchableOpacity,
   View,
   Image,
+  Alert,
 } from 'react-native';
 import { Octicons } from '@expo/vector-icons';
 import * as SecureStore from 'expo-secure-store';
 import { ActivityIndicator } from 'react-native';
 import { logout } from 'services/authService';
-import { User } from 'interfaces/types';
 import { useNavigation } from '@react-navigation/native';
+import * as ImagePicker from 'expo-image-picker'
 import UpdatePasswordModal from 'components/modals/UpdatePasswordModal';
+import { useUser } from 'contexts/UserContext';
+import { uploadProfilePhoto } from 'services/userService';
 
 export default function Profile() {
   const navigation = useNavigation();
-
-  const [user, setUser] = useState<User | null>(null);
+  const { user, setUser } = useUser();
   const [loading, setLoading] = useState(true);
   const [isPasswordModalVisible, setIsPasswordModalVisible] = useState(false);
 
@@ -34,6 +36,42 @@ export default function Profile() {
       });
     } else {
       console.error('Logout failed:', response.error);
+    }
+  };
+
+  const handleImageUpload = async () => {
+    // 1. Launch image picker
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+      base64: false, // Not needed for FormData upload
+    });
+
+    if (result.canceled) return;
+
+    const asset = result.assets[0];
+    if (!asset?.uri) return;
+
+    // 2. Prepare FormData
+    const uriParts = asset.uri.split('.');
+    const fileType = uriParts[uriParts.length - 1];
+    const fileName = asset.fileName || `profile.${fileType}`;
+
+    const formData = new FormData();
+    formData.append('file', {
+      uri: asset.uri,
+      name: fileName,
+      type: asset.type || `image/${fileType}`,
+    } as any); // 'as any' is needed for React Native FormData
+
+    // 3. Upload to API
+    const response = await uploadProfilePhoto(user?.id ?? " ", formData, setUser);
+    if (!response.ok) {
+      console.error("Some error in uploading the image", response.message);
+    } else {
+      Alert.alert("Image Upload Successful", "The new avatar will be visible after a re-login");
     }
   };
 
@@ -79,7 +117,6 @@ export default function Profile() {
 
       <StatusBar barStyle="dark-content" backgroundColor="#f9fafb" />
       <ScrollView className="flex-1">
-
         {/* Header */}
         <View className="flex-row items-center justify-between px-4">
           <TouchableOpacity className="p-2" onPress={() => navigation.goBack()}>
@@ -92,18 +129,21 @@ export default function Profile() {
 
         {/* Profile Image and Name */}
         <View className="relative mt-5 items-center">
-          {user.profileImage ? (
-            <Image
-              source={{ uri: `data:image/png;base64,${user.profileImage}` }}
-              className="h-36 w-36 rounded-full bg-gray-200"
-            />
-          ) : (
-            <View className="h-36 w-36 items-center justify-center rounded-full bg-purple-500">
-              <Text className="text-5xl font-bold text-white">
-                {user.username.substring(0, 2).toUpperCase()}
-              </Text>
-            </View>
-          )}
+          <TouchableOpacity onPress={handleImageUpload} activeOpacity={0.7}>
+            {user.profileImage ? (
+              <Image
+                source={{ uri: `data:image/png;base64,${user.profileImage}` }}
+                className="h-36 w-36 rounded-full bg-gray-200"
+                key={user.profileImage}
+              />
+            ) : (
+              <View className="h-36 w-36 items-center justify-center rounded-full bg-purple-500">
+                <Text className="text-5xl font-bold text-white">
+                  {user.username.substring(0, 2).toUpperCase()}
+                </Text>
+              </View>
+            )}
+          </TouchableOpacity>
         </View>
 
         <Text className="mt-4 text-center text-2xl font-bold text-gray-800">{user.username}</Text>

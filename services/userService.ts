@@ -1,4 +1,5 @@
 import { ForgotPasswordRequestDTO, UpdatePasswordRequestDTO } from "interfaces/dto"
+import { User } from "interfaces/types";
 import apiClient from "services/apiClient";
 
 export const updatePassword = async (currentPassword: string, newPassword: string, userId: string) => {
@@ -92,5 +93,37 @@ export const forgotPassword = async (username: string, twoFactorCode: number, ne
           ok: false,
           message: 'An error occurred while updating the password',
         };
+    }
+}
+
+
+export const uploadProfilePhoto = async (userId: string, formData: any, setUser: any) => {
+    try {
+      const response = await apiClient.put(
+        `/api/users/${userId}/profileImage`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+
+      if (response.data?.base64Image) {
+        setUser((prev: User) => ({
+          ...prev,
+          profileImage: response.data.base64Image,
+        }));
+      }
+        return {
+            ok: true,
+            message: "Image uploaded successfully"
+        }
+    } catch (error) {
+        console.error('Image upload failed:', error);
+        return {
+            ok: false,
+            message: error
+        }
     }
 }

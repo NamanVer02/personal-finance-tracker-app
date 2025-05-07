@@ -4,7 +4,7 @@ import type { User } from '../interfaces/types';
 
 interface UserContextType {
   user: User | null;
-  setUser: (user: User | null) => Promise<void>;
+  setUser: (user: User | null) => void;
 }
 
 const UserContext = createContext<UserContextType>({
@@ -27,7 +27,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     if (user) {
       await SecureStore.setItemAsync('user', JSON.stringify(user));
     } else {
-      await SecureStore.deleteItemAsync('user');
+      SecureStore.deleteItemAsync('user');
     }
   };
 
