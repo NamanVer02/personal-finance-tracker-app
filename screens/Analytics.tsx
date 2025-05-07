@@ -198,7 +198,7 @@ export default function FinancialAnalysisScreen() {
         <Text className="mb-4 text-lg font-semibold">Spending by Category</Text>
         <PieChart
           data={pieData}
-          width={screenWidth - 48}
+          width={screenWidth - 96}
           height={220}
           chartConfig={{
             backgroundColor: '#ffffff',
@@ -210,7 +210,7 @@ export default function FinancialAnalysisScreen() {
           backgroundColor="transparent"
           paddingLeft="15"
           absolute
-          hasLegend={false}
+          hasLegend={true}
         />
 
         <View className="mt-4">
