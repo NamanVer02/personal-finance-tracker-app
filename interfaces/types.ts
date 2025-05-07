@@ -75,3 +75,42 @@ export interface FinanceDetails {
   income_by_category: number[];
   expense_by_category: number[];
 }
+
+export interface FinanceEntry {
+  id: string;
+  type: string;
+  category: string;
+  amount: number;
+  date: string;
+  description: string;
+  label: string;
+}
+
+export interface FinanceAnalyticsData {
+  totalIncome: number;
+  totalExpense: number;
+  netBalance: number;
+  categoryBreakdown: {
+    category: string;
+    amount: number;
+    percentage: number;
+  }[];
+  monthlyTrend: {
+    month: string;
+    income: number;
+    expense: number;
+  }[];
+}
+
+export interface FilterParams {
+  type?: string;
+  category?: string;
+  minAmount?: number;
+  maxAmount?: number;
+  startDate?: string;
+  endDate?: string;
+  searchTerm?: string;
+  page: number;
+  size: number;
+  sort: string[];
+}

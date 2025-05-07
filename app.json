@@ -33,6 +33,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.anonymous.personalfinancetracker"
-    }
+    },
+    "newArchEnabled": true
   }
 }

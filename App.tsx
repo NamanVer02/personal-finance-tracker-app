@@ -9,7 +9,7 @@ import { ActivityIndicator, View } from 'react-native';
 import Login from 'screens/Login';
 import Register from 'screens/Register';
 import Dashboard from 'screens/Dashboard';
-import ProfileScreen from './screens/ProfileScreen';
+import Profile from './screens/Profile';
 import SettingsScreen from './screens/SettingsScreen';
 import TabBar from './components/ui/TabBar';
 import type { RootStackParamList } from './interfaces/types';
@@ -29,7 +29,7 @@ function BottomTabNavigator() {
       <BottomTab.Screen name="Dashboard" component={Dashboard} />
       <BottomTab.Screen name="Analytics" component={Analytics} />
       <BottomTab.Screen name="Transactions" component={SettingsScreen} />
-      <BottomTab.Screen name="Profile" component={ProfileScreen} />
+      <BottomTab.Screen name="Profile" component={Profile} />
     </BottomTab.Navigator>
   );
 }

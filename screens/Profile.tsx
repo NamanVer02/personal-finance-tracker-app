@@ -23,7 +23,6 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [isPasswordModalVisible, setIsPasswordModalVisible] = useState(false);
 
-  
   const handleLogout = async () => {
     const response = await logout();
     if (response.ok) {
@@ -31,13 +30,12 @@ export default function Profile() {
 
       navigation.reset({
         index: 0,
-        routes: [{name: 'Login'}]
-      })
+        routes: [{ name: 'Login' }],
+      });
     } else {
       console.error('Logout failed:', response.error);
     }
   };
-
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -74,23 +72,22 @@ export default function Profile() {
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
-
       <UpdatePasswordModal
         visible={isPasswordModalVisible}
         onClose={() => setIsPasswordModalVisible(false)}
       />
 
       <StatusBar barStyle="dark-content" backgroundColor="#f9fafb" />
-      <ScrollView className="flex-1 p-4">
+      <ScrollView className="flex-1">
+
         {/* Header */}
-        <View className="flex-row items-center justify-between px-1">
+        <View className="flex-row items-center justify-between px-4">
           <TouchableOpacity className="p-2" onPress={() => navigation.goBack()}>
             <Octicons name="arrow-left" size={24} color="#6b7280" />
           </TouchableOpacity>
           <Text className="text-xl font-bold text-gray-800">Profile</Text>
-          <TouchableOpacity className="p-2">
-            <Octicons name="gear" size={24} color="#6b7280" />
-          </TouchableOpacity>
+          {/* Empty View to maintain spacing */}
+          <View style={{ width: 32 }} /> {/* Same width as the back button */}
         </View>
 
         {/* Profile Image and Name */}
@@ -125,7 +122,7 @@ export default function Profile() {
         </View>
 
         {/* Account Settings Section */}
-        <View className="mt-8 rounded-2xl bg-white p-4 shadow-sm">
+        <View className="mx-6 mt-8 rounded-2xl bg-white p-4 shadow-sm">
           <Text className="mb-4 text-lg font-semibold text-gray-800">Account Settings</Text>
 
           <TouchableOpacity className="flex-row items-center border-b border-gray-100 py-4">
@@ -136,7 +133,9 @@ export default function Profile() {
             <Octicons name="chevron-right" size={20} color="#6b7280" />
           </TouchableOpacity>
 
-          <TouchableOpacity className="flex-row items-center border-b border-gray-100 py-4" onPress={() => setIsPasswordModalVisible(true)}>
+          <TouchableOpacity
+            className="flex-row items-center border-b border-gray-100 py-4"
+            onPress={() => setIsPasswordModalVisible(true)}>
             <View className="mr-4 h-10 w-10 items-center justify-center rounded-full bg-purple-100">
               <Octicons name="shield-lock" size={20} color="#8b5cf6" />
             </View>
@@ -166,7 +165,7 @@ export default function Profile() {
         </View>
 
         {/* Preferences Section */}
-        {/* <View className="mt-6 rounded-2xl bg-white p-4 shadow-sm">
+        {/* <View className="mt-6 mx-6 rounded-2xl bg-white p-4 shadow-sm">
           <Text className="mb-4 text-lg font-semibold text-gray-800">Preferences</Text>
 
           <TouchableOpacity className="flex-row items-center border-b border-gray-100 py-4">
@@ -187,7 +186,9 @@ export default function Profile() {
         </View> */}
 
         {/* Logout Button */}
-        <TouchableOpacity className="mb-4 mt-8 flex-row items-center justify-center rounded-xl bg-red-100 p-4" onPress={handleLogout}>
+        <TouchableOpacity
+          className="mx-6 mb-4 mt-8 flex-row items-center justify-center rounded-xl bg-red-100 p-4"
+          onPress={handleLogout}>
           <Octicons name="sign-out" size={20} color="#ef4444" />
           <Text className="ml-2 text-base font-semibold text-red-500">Logout</Text>
         </TouchableOpacity>
