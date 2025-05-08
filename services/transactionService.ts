@@ -1,19 +1,43 @@
 import apiClient from "./apiClient";
 import { TransactionDTO } from "interfaces/dto";
 import * as SecureStore from 'expo-secure-store';
-import { FinanceDetails } from "interfaces/types";
+import { FinanceDetails, FetchAllTransactionParams } from "interfaces/types";
 
 
 
 export const fetchTransactions = async () => {
     try {
-        const response = await apiClient.get("/api/search");
+        const response = await apiClient.post("/api/search");
         return response.data;
     } catch (error) {
         console.error("Error fetching transactions:", error);
         throw error;
     }
 }
+
+
+export const fetchAllTransactions = async (params: FetchAllTransactionParams = {}) => {
+    try {
+        const response = await apiClient.post('/api/search', null, {
+            params: {
+                type: params.type,
+                category: params.category,
+                minAmount: params.minAmount,
+                maxAmount: params.maxAmount,
+                startDate: params.startDate,
+                endDate: params.endDate,
+                searchTerm: params.searchTerm,
+                page: params.page ?? 0,
+                size: params.size ?? 8,
+                sort: params.sort ?? ['date,desc'],
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching all transactions:', error);
+        throw error;
+    }
+};
 
 
 export const addTransaction = async (transaction: TransactionDTO) => {

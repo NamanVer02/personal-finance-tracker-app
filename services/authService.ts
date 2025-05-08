@@ -6,9 +6,8 @@ import { User } from '../interfaces/types';
 
 export const login = async (loginRequest: LoginRequestDTO) => {
   try {
-    // Send the fields directly unless your backend expects { loginRequest: { ... } }
     const response = await apiClient.post(
-      'api/auth/signin',
+      '/api/auth/signin',
       loginRequest,
       { headers: { skipAuth: true } }
     );
@@ -46,6 +45,7 @@ export const login = async (loginRequest: LoginRequestDTO) => {
     };
   } catch (error: unknown) {
     let message = 'Login failed. Please try again.';
+    console.error('Login error:', error);
 
     // Safe error extraction
     if (

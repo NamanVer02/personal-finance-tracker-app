@@ -45,6 +45,7 @@ export type RootStackParamList = {
     qrCodeBase64: string;
   };
   ForgotPassword: undefined;
+  Transactions: undefined;
 };
 
 declare global {
@@ -113,4 +114,17 @@ export interface FilterParams {
   page: number;
   size: number;
   sort: string[];
+}
+
+export interface FetchAllTransactionParams {
+  type?: string;
+  category?: string;
+  minAmount?: number;
+  maxAmount?: number;
+  startDate?: string; // ISO date string (YYYY-MM-DD)
+  endDate?: string; // ISO date string (YYYY-MM-DD)
+  searchTerm?: string;
+  page?: number;
+  size?: number;
+  sort?: string[];
 }

@@ -10,13 +10,13 @@ import Login from 'screens/Login';
 import Register from 'screens/Register';
 import Dashboard from 'screens/Dashboard';
 import Profile from './screens/Profile';
-import SettingsScreen from './screens/SettingsScreen';
 import TabBar from './components/ui/TabBar';
 import type { RootStackParamList } from './interfaces/types';
 import { UserProvider, useUser } from './contexts/UserContext';
 import Analytics from 'screens/Analytics';
 import GoogleAuthSetup from 'screens/GoogleAuthSetup';
 import ForgotPassword from 'screens/ForgotPassword';
+import Transactions from './screens/Transactions';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const BottomTab = createBottomTabNavigator();
@@ -28,7 +28,7 @@ function BottomTabNavigator() {
       screenOptions={{ headerShown: false }}>
       <BottomTab.Screen name="Dashboard" component={Dashboard} />
       <BottomTab.Screen name="Analytics" component={Analytics} />
-      <BottomTab.Screen name="Transactions" component={SettingsScreen} />
+      <BottomTab.Screen name="Transactions" component={Transactions}/>
       <BottomTab.Screen name="Profile" component={Profile} />
     </BottomTab.Navigator>
   );

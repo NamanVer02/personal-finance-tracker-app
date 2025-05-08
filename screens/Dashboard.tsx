@@ -11,11 +11,12 @@ import { Swipeable, GestureHandlerRootView } from 'react-native-gesture-handler'
 import EditTransactionModal from 'components/modals/EditTransactionModal';
 import DeleteTransactionModal from 'components/modals/DeleteTransactionModal';
 import { deleteTransaction, fetchFinanceDetails } from 'services/transactionService';
-import { colorScheme } from 'nativewind';
 import ThemeToggle from 'components/ui/theme-toggle';
+import { useNavigation } from '@react-navigation/native';
 
 export default function Dashboard() {
   const { user } = useUser();
+  const navigation = useNavigation();
   const swipeableRefs = useRef<{ [key: number]: Swipeable | null }>({});
 
   const [addTransactionModalVisible, setAddTransactionModalVisible] = useState(false);
@@ -229,7 +230,7 @@ export default function Dashboard() {
         <View className="mb-20 mt-14 px-4">
           <View className="mb-4 flex-row items-center justify-between">
             <Text className="text-lg font-semibold">Recent Transactions</Text>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => {navigation.navigate('Transactions')}}>
               <Text className="text-text">See All</Text>
             </TouchableOpacity>
           </View>
