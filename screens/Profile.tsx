@@ -14,14 +14,19 @@ import * as SecureStore from 'expo-secure-store';
 import { ActivityIndicator } from 'react-native';
 import { logout } from 'services/authService';
 import { useNavigation } from '@react-navigation/native';
-import * as ImagePicker from 'expo-image-picker'
+import * as ImagePicker from 'expo-image-picker';
 import UpdatePasswordModal from 'components/modals/UpdatePasswordModal';
 import { useUser } from 'contexts/UserContext';
+import { useTheme } from 'contexts/ThemeContext';
+import { useThemeStyles } from 'contexts/ThemeUtils';
 import { uploadProfilePhoto } from 'services/userService';
+import ThemeToggle from 'components/ui/theme-toggle';
 
 export default function Profile() {
   const navigation = useNavigation();
   const { user, setUser } = useUser();
+  const { isDarkMode } = useTheme();
+  const styles = useThemeStyles();
   const [loading, setLoading] = useState(true);
   const [isPasswordModalVisible, setIsPasswordModalVisible] = useState(false);
 
@@ -67,11 +72,11 @@ export default function Profile() {
     } as any); // 'as any' is needed for React Native FormData
 
     // 3. Upload to API
-    const response = await uploadProfilePhoto(user?.id ?? " ", formData, setUser);
+    const response = await uploadProfilePhoto(user?.id ?? ' ', formData, setUser);
     if (!response.ok) {
-      console.error("Some error in uploading the image", response.message);
+      console.error('Some error in uploading the image', response.message);
     } else {
-      Alert.alert("Image Upload Successful", "The new avatar will be visible after a re-login");
+      Alert.alert('Image Upload Successful', 'The new avatar will be visible after a re-login');
     }
   };
 
@@ -94,7 +99,7 @@ export default function Profile() {
 
   if (loading) {
     return (
-      <View className="flex-1 items-center justify-center">
+      <View className={`flex-1 items-center justify-center ${styles.bgPrimary}`}>
         <ActivityIndicator size="large" color="#8b5cf6" />
       </View>
     );
@@ -102,29 +107,30 @@ export default function Profile() {
 
   if (!user) {
     return (
-      <View className="flex-1 items-center justify-center">
+      <View className={`flex-1 items-center justify-center ${styles.bgPrimary}`}>
         <Text className="text-base text-red-500">User not found. Please login again.</Text>
       </View>
     );
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-50">
+    <SafeAreaView className={`flex-1 ${styles.bgPrimary}`}>
       <UpdatePasswordModal
         visible={isPasswordModalVisible}
         onClose={() => setIsPasswordModalVisible(false)}
       />
 
-      <StatusBar barStyle="dark-content" backgroundColor="#f9fafb" />
+      <StatusBar barStyle={styles.statusBarStyle} backgroundColor={styles.statusBarBgColor} />
       <ScrollView className="flex-1">
         {/* Header */}
         <View className="flex-row items-center justify-between px-4">
           <TouchableOpacity className="p-2" onPress={() => navigation.goBack()}>
-            <Octicons name="arrow-left" size={24} color="#6b7280" />
+            <Text>
+              <Octicons name="arrow-left" size={24} color={isDarkMode ? '#d1d5db' : '#6b7280'} />
+            </Text>
           </TouchableOpacity>
-          <Text className="text-xl font-bold text-gray-800">Profile</Text>
-          {/* Empty View to maintain spacing */}
-          <View style={{ width: 32 }} /> {/* Same width as the back button */}
+          <Text className={`text-xl font-bold ${styles.textPrimary}`}>Profile</Text>
+          <View style={{ width: 32 }} />
         </View>
 
         {/* Profile Image and Name */}
@@ -133,7 +139,7 @@ export default function Profile() {
             {user.profileImage ? (
               <Image
                 source={{ uri: `data:image/png;base64,${user.profileImage}` }}
-                className="h-36 w-36 rounded-full bg-gray-200"
+                className={`h-36 w-36 rounded-full ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}
                 key={user.profileImage}
               />
             ) : (
@@ -146,92 +152,86 @@ export default function Profile() {
           </TouchableOpacity>
         </View>
 
-        <Text className="mt-4 text-center text-2xl font-bold text-gray-800">{user.username}</Text>
-        <Text className="mt-1 text-center text-base text-gray-500">{user.email}</Text>
+        <Text className={`mt-4 text-center text-2xl font-bold ${styles.textPrimary}`}>
+          {user.username}
+        </Text>
+        <Text className={`mt-1 text-center text-base ${styles.textSecondary}`}>{user.email}</Text>
 
         {/* Role Badges */}
         <View className="mt-3 flex-row flex-wrap justify-center">
           {user.roles.map((role, index) => (
-            <View key={index} className="mx-1 mb-2 rounded-full bg-purple-100 px-3 py-1.5">
-              <Text className="text-sm font-semibold text-purple-700">{role.substring(5)}</Text>
+            <View
+              key={index}
+              className={`mx-1 mb-2 rounded-full ${isDarkMode ? 'bg-purple-900' : 'bg-purple-100'} px-3 py-1.5`}>
+              <Text
+                className={`text-sm font-semibold ${isDarkMode ? 'text-purple-200' : 'text-purple-700'}`}>
+                {role.substring(5)}
+              </Text>
             </View>
           ))}
         </View>
 
         {/* Account Settings Section */}
-        <View className="mx-6 mt-8 rounded-2xl bg-white p-4 ">
-          <Text className="mb-4 text-lg font-semibold text-gray-800">Account Settings</Text>
+        <View className={`mx-6 mt-8 rounded-2xl ${styles.bgSecondary} p-4`}>
+          <Text className={`mb-4 text-lg font-semibold ${styles.textPrimary}`}>
+            Account Settings
+          </Text>
 
-          <TouchableOpacity className="flex-row items-center border-b border-gray-100 py-4">
-            <View className="mr-4 h-10 w-10 items-center justify-center rounded-full bg-purple-100">
-              <Octicons name="person" size={20} color="#8b5cf6" />
+          <TouchableOpacity className={`flex-row items-center border-b ${styles.borderColor} py-4`}>
+            <View
+              className={`mr-4 h-10 w-10 items-center justify-center rounded-full ${styles.iconBg}`}>
+              <Text>
+                <Octicons name="person" size={20} color={styles.iconColor} />
+              </Text>
             </View>
-            <Text className="flex-1 text-base text-gray-600">Edit Profile</Text>
-            <Octicons name="chevron-right" size={20} color="#6b7280" />
+            <Text className={`flex-1 text-base ${styles.textSecondary}`}>Edit Profile</Text>
+            <Text>
+              <Octicons name="chevron-right" size={20} color={isDarkMode ? '#d1d5db' : '#6b7280'} />
+            </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             className="flex-row items-center py-4"
             onPress={() => setIsPasswordModalVisible(true)}>
-            <View className="mr-4 h-10 w-10 items-center justify-center rounded-full bg-purple-100">
-              <Octicons name="shield-lock" size={20} color="#8b5cf6" />
+            <View
+              className={`mr-4 h-10 w-10 items-center justify-center rounded-full ${styles.iconBg}`}>
+              <Text>
+                <Octicons name="shield-lock" size={20} color={styles.iconColor} />
+              </Text>
             </View>
-            <Text className="flex-1 text-base text-gray-600">Update Password</Text>
-            <Octicons name="chevron-right" size={20} color="#6b7280" />
+            <Text className={`flex-1 text-base ${styles.textSecondary}`}>Update Password</Text>
+            <Text>
+              <Octicons name="chevron-right" size={20} color={isDarkMode ? '#d1d5db' : '#6b7280'} />
+            </Text>
           </TouchableOpacity>
 
-          {/* <TouchableOpacity className="flex-row items-center border-b border-gray-100 py-4">
-            <View className="mr-4 h-10 w-10 items-center justify-center rounded-full bg-purple-100">
-              <Octicons name="bell" size={20} color="#8b5cf6" />
+          {/* Uncomment if needed
+          <TouchableOpacity className={`flex-row items-center border-b ${styles.borderColor} py-4`}>
+            <View className={`mr-4 h-10 w-10 items-center justify-center rounded-full ${styles.iconBg}`}>
+              <Text>
+                <Octicons name="bell" size={20} color={styles.iconColor} />
+              </Text>
             </View>
-            <Text className="flex-1 text-base text-gray-600">Notifications</Text>
-            <Octicons name="chevron-right" size={20} color="#6b7280" />
+            <Text className={`flex-1 text-base ${styles.textSecondary}`}>Notifications</Text>
+            <Text>
+              <Octicons name="chevron-right" size={20} color={isDarkMode ? "#d1d5db" : "#6b7280"} />
+            </Text>
           </TouchableOpacity>
-
-          {user.twoFactorRequired && (
-            <TouchableOpacity className="flex-row items-center border-b border-gray-100 py-4">
-              <View className="mr-4 h-10 w-10 items-center justify-center rounded-full bg-purple-100">
-                <Octicons name="shield-check" size={20} color="#8b5cf6" />
-              </View>
-              <Text className="flex-1 text-base text-gray-600">Two-Factor Authentication</Text>
-              <View className="rounded-md bg-green-100 px-2.5 py-1">
-                <Text className="text-xs font-semibold text-green-700">Enabled</Text>
-              </View>
-            </TouchableOpacity>
-          )} */}
+          */}
         </View>
-
-        {/* Preferences Section */}
-        {/* <View className="mt-6 mx-6 rounded-2xl bg-white p-4 ">
-          <Text className="mb-4 text-lg font-semibold text-gray-800">Preferences</Text>
-
-          <TouchableOpacity className="flex-row items-center border-b border-gray-100 py-4">
-            <View className="mr-4 h-10 w-10 items-center justify-center rounded-full bg-purple-100">
-              <Octicons name="paintbrush" size={20} color="#8b5cf6" />
-            </View>
-            <Text className="flex-1 text-base text-gray-600">Appearance</Text>
-            <Octicons name="chevron-right" size={20} color="#6b7280" />
-          </TouchableOpacity>
-
-          <TouchableOpacity className="flex-row items-center py-4">
-            <View className="mr-4 h-10 w-10 items-center justify-center rounded-full bg-purple-100">
-              <Octicons name="globe" size={20} color="#8b5cf6" />
-            </View>
-            <Text className="flex-1 text-base text-gray-600">Language</Text>
-            <Octicons name="chevron-right" size={20} color="#6b7280" />
-          </TouchableOpacity>
-        </View> */}
 
         {/* Logout Button */}
         <TouchableOpacity
-          className="mx-6 mb-4 mt-8 flex-row items-center justify-center rounded-xl bg-red-100 p-4"
+          className={`mx-6 mb-4 mt-8 flex-row items-center justify-center rounded-xl ${isDarkMode ? 'bg-red-900/30' : 'bg-red-100'} p-4`}
           onPress={handleLogout}>
-          <Octicons name="sign-out" size={20} color="#ef4444" />
+          <Text>
+            <Octicons name="sign-out" size={20} color="#ef4444" />
+          </Text>
           <Text className="ml-2 text-base font-semibold text-red-500">Logout</Text>
         </TouchableOpacity>
 
         <View className="mb-8 items-center">
-          <Text className="text-sm text-gray-400">App Version 1.0.0</Text>
+          <Text className={`text-sm ${styles.textMuted}`}>App Version 1.0.0</Text>
         </View>
       </ScrollView>
     </SafeAreaView>

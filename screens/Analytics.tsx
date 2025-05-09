@@ -16,11 +16,16 @@ import { FilterParams } from '../interfaces/types';
 import { BarChart, PieChart } from 'react-native-chart-kit';
 import { Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { useTheme } from 'contexts/ThemeContext';
+import { useThemeStyles } from 'contexts/ThemeUtils';
+import ThemeToggle from 'components/ui/theme-toggle';
 
 const screenWidth = Dimensions.get('window').width;
 
 export default function FinancialAnalysisScreen() {
   const navigation = useNavigation();
+  const { isDarkMode } = useTheme();
+  const styles = useThemeStyles();
 
   const [dateRange, setDateRange] = useState<'week' | 'month' | 'year'>('month');
   const [filters, setFilters] = useState<FilterParams>({
@@ -76,12 +81,14 @@ export default function FinancialAnalysisScreen() {
   }, []);
 
   const renderDateRangeSelector = () => (
-    <View className="mx-4 mb-6 flex-row justify-center rounded-full bg-white p-1">
+    <View className={`mx-4 mb-6 flex-row justify-center rounded-full ${styles.bgSecondary} p-1`}>
       <TouchableOpacity
         className={`flex-1 rounded-full py-2 ${dateRange === 'week' ? 'bg-purple-500' : 'bg-transparent'}`}
         onPress={() => updateDateRange('week')}>
         <Text
-          className={`text-center font-medium ${dateRange === 'week' ? 'text-white' : 'text-gray-600'}`}>
+          className={`text-center font-medium ${
+            dateRange === 'week' ? 'text-white' : styles.textSecondary
+          }`}>
           Week
         </Text>
       </TouchableOpacity>
@@ -89,7 +96,9 @@ export default function FinancialAnalysisScreen() {
         className={`flex-1 rounded-full py-2 ${dateRange === 'month' ? 'bg-purple-500' : 'bg-transparent'}`}
         onPress={() => updateDateRange('month')}>
         <Text
-          className={`text-center font-medium ${dateRange === 'month' ? 'text-white' : 'text-gray-600'}`}>
+          className={`text-center font-medium ${
+            dateRange === 'month' ? 'text-white' : styles.textSecondary
+          }`}>
           Month
         </Text>
       </TouchableOpacity>
@@ -97,7 +106,9 @@ export default function FinancialAnalysisScreen() {
         className={`flex-1 rounded-full py-2 ${dateRange === 'year' ? 'bg-purple-500' : 'bg-transparent'}`}
         onPress={() => updateDateRange('year')}>
         <Text
-          className={`text-center font-medium ${dateRange === 'year' ? 'text-white' : 'text-gray-600'}`}>
+          className={`text-center font-medium ${
+            dateRange === 'year' ? 'text-white' : styles.textSecondary
+          }`}>
           Year
         </Text>
       </TouchableOpacity>
@@ -106,22 +117,26 @@ export default function FinancialAnalysisScreen() {
 
   const renderSummaryCards = () => (
     <View className="mb-6 flex-row justify-between px-4">
-      <View className="w-[47%] rounded-xl bg-white p-4 ">
+      <View className={`w-[47%] rounded-xl ${styles.bgSecondary} p-4`}>
         <View className="mb-2 h-8 w-8 items-center justify-center rounded-full bg-green-100">
-          <Octicons name="arrow-down" size={16} color="#10b981" />
+          <Text>
+            <Octicons name="arrow-down" size={16} color="#10b981" />
+          </Text>
         </View>
-        <Text className="text-xs text-gray-500">Income</Text>
-        <Text className="text-base font-bold text-gray-800">
+        <Text className={styles.textSecondary}>Income</Text>
+        <Text className={`text-base font-bold ${styles.textPrimary}`}>
           ${analytics?.totalIncome.toFixed(2)}
         </Text>
       </View>
 
-      <View className="w-[47%] rounded-xl bg-white p-4 ">
+      <View className={`w-[47%] rounded-xl ${styles.bgSecondary} p-4`}>
         <View className="mb-2 h-8 w-8 items-center justify-center rounded-full bg-red-100">
-          <Octicons name="arrow-up" size={16} color="#ef4444" />
+          <Text>
+            <Octicons name="arrow-up" size={16} color="#ef4444" />
+          </Text>
         </View>
-        <Text className="text-xs text-gray-500">Expenses</Text>
-        <Text className="text-base font-bold text-gray-800">
+        <Text className={styles.textSecondary}>Expenses</Text>
+        <Text className={`text-base font-bold ${styles.textPrimary}`}>
           ${analytics?.totalExpense.toFixed(2)}
         </Text>
       </View>
@@ -149,8 +164,10 @@ export default function FinancialAnalysisScreen() {
     };
 
     return (
-      <View className="mx-4 mb-6 rounded-xl bg-white p-4">
-        <Text className="mb-4 text-lg font-semibold">Income vs Expenses</Text>
+      <View className={`mx-4 mb-6 rounded-xl ${styles.bgSecondary} p-4`}>
+        <Text className={`mb-4 text-lg font-semibold ${styles.textPrimary}`}>
+          Income vs Expenses
+        </Text>
         <BarChart
           data={chartData}
           width={screenWidth - 96}
@@ -158,12 +175,14 @@ export default function FinancialAnalysisScreen() {
           yAxisLabel="$"
           yAxisSuffix=""
           chartConfig={{
-            backgroundColor: '#ffffff',
-            backgroundGradientFrom: '#ffffff',
-            backgroundGradientTo: '#ffffff',
+            backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
+            backgroundGradientFrom: isDarkMode ? '#1f2937' : '#ffffff',
+            backgroundGradientTo: isDarkMode ? '#1f2937' : '#ffffff',
             decimalPlaces: 0,
-            color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-            labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+            color: (opacity = 1) =>
+              isDarkMode ? `rgba(255, 255, 255, ${opacity})` : `rgba(0, 0, 0, ${opacity})`,
+            labelColor: (opacity = 1) =>
+              isDarkMode ? `rgba(255, 255, 255, ${opacity})` : `rgba(0, 0, 0, ${opacity})`,
             style: {
               borderRadius: 16,
             },
@@ -188,23 +207,26 @@ export default function FinancialAnalysisScreen() {
         amount: item.amount,
         percentage: item.percentage,
         color: colors[index % colors.length],
-        legendFontColor: '#7F7F7F',
+        legendFontColor: isDarkMode ? '#d1d5db' : '#7F7F7F',
         legendFontSize: 12,
       };
     });
 
     return (
-      <View className="mx-4 mb-6 rounded-xl bg-white p-4 ">
-        <Text className="mb-4 text-lg font-semibold">Spending by Category</Text>
+      <View className={`mx-4 mb-6 rounded-xl ${styles.bgSecondary} p-4`}>
+        <Text className={`mb-4 text-lg font-semibold ${styles.textPrimary}`}>
+          Spending by Category
+        </Text>
         <PieChart
           data={pieData}
           width={screenWidth - 96}
           height={220}
           chartConfig={{
-            backgroundColor: '#ffffff',
-            backgroundGradientFrom: '#ffffff',
-            backgroundGradientTo: '#ffffff',
-            color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+            backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
+            backgroundGradientFrom: isDarkMode ? '#1f2937' : '#ffffff',
+            backgroundGradientTo: isDarkMode ? '#1f2937' : '#ffffff',
+            color: (opacity = 1) =>
+              isDarkMode ? `rgba(255, 255, 255, ${opacity})` : `rgba(0, 0, 0, ${opacity})`,
           }}
           accessor="amount"
           backgroundColor="transparent"
@@ -221,11 +243,11 @@ export default function FinancialAnalysisScreen() {
                   className="mr-2 h-3 w-3 rounded-full"
                   style={{ backgroundColor: pieData[index].color }}
                 />
-                <Text className="text-gray-800">{item.category}</Text>
+                <Text className={styles.textPrimary}>{item.category}</Text>
               </View>
               <View className="flex-row">
-                <Text className="mr-2 text-gray-600">${item.amount.toFixed(2)}</Text>
-                <Text className="text-gray-500">({item.percentage.toFixed(1)}%)</Text>
+                <Text className={`mr-2 ${styles.textSecondary}`}>${item.amount.toFixed(2)}</Text>
+                <Text className={styles.textMuted}>({item.percentage.toFixed(1)}%)</Text>
               </View>
             </View>
           ))}
@@ -236,19 +258,23 @@ export default function FinancialAnalysisScreen() {
 
   if (loading && !analytics) {
     return (
-      <SafeAreaView className="flex-1 items-center justify-center bg-gray-50">
+      <SafeAreaView className={`flex-1 items-center justify-center ${styles.bgPrimary}`}>
         <ActivityIndicator size="large" color="#8b5cf6" />
-        <Text className="mt-4 text-gray-600">Loading financial data...</Text>
+        <Text className={`mt-4 ${styles.textSecondary}`}>Loading financial data...</Text>
       </SafeAreaView>
     );
   }
 
   if (error) {
     return (
-      <SafeAreaView className="flex-1 items-center justify-center bg-gray-50 p-4">
-        <Octicons name="alert" size={48} color="#ef4444" />
-        <Text className="mt-4 text-lg font-semibold text-gray-800">Something went wrong</Text>
-        <Text className="mt-2 text-center text-gray-600">{error}</Text>
+      <SafeAreaView className={`flex-1 items-center justify-center ${styles.bgPrimary} p-4`}>
+        <Text>
+          <Octicons name="alert" size={48} color="#ef4444" />
+        </Text>
+        <Text className={`mt-4 text-lg font-semibold ${styles.textPrimary}`}>
+          Something went wrong
+        </Text>
+        <Text className={`mt-2 text-center ${styles.textSecondary}`}>{error}</Text>
         <TouchableOpacity
           className="mt-6 rounded-full bg-purple-500 px-6 py-3"
           onPress={() => fetchFinanceData(filters)}>
@@ -259,17 +285,18 @@ export default function FinancialAnalysisScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-50">
-      <StatusBar barStyle="dark-content" backgroundColor="#f9fafb" />
+    <SafeAreaView className={`flex-1 ${styles.bgPrimary}`}>
+      <StatusBar barStyle={styles.statusBarStyle} backgroundColor={styles.statusBarBgColor} />
 
       {/* Header */}
       <View className="mb-6 flex-row items-center justify-between px-4">
         <TouchableOpacity className="p-2" onPress={() => navigation.goBack()}>
-          <Octicons name="arrow-left" size={24} color="#6b7280" />
+          <Text>
+            <Octicons name="arrow-left" size={24} color={isDarkMode ? '#d1d5db' : '#6b7280'} />
+          </Text>
         </TouchableOpacity>
-        <Text className="text-xl font-bold text-gray-800">Financial Analytics</Text>
-        {/* Empty View to maintain spacing */}
-        <View style={{ width: 32 }} /> {/* Same width as the back button */}
+        <Text className={`text-xl font-bold ${styles.textPrimary}`}>Financial Analytics</Text>
+        <View style={{ width: 32 }} />
       </View>
 
       <ScrollView
@@ -293,9 +320,13 @@ export default function FinancialAnalysisScreen() {
           </>
         ) : (
           <View className="flex-1 items-center justify-center p-8">
-            <Octicons name="graph" size={48} color="#d1d5db" />
-            <Text className="mt-4 text-lg font-semibold text-gray-800">No data available</Text>
-            <Text className="mt-2 text-center text-gray-600">
+            <Text>
+              <Octicons name="graph" size={48} color={isDarkMode ? '#4b5563' : '#d1d5db'} />
+            </Text>
+            <Text className={`mt-4 text-lg font-semibold ${styles.textPrimary}`}>
+              No data available
+            </Text>
+            <Text className={`mt-2 text-center ${styles.textSecondary}`}>
               Try adjusting your filters or add some transactions to see your financial analysis.
             </Text>
           </View>

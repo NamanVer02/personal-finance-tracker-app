@@ -13,14 +13,16 @@ import {
 import { Octicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
-import { useColorScheme } from 'nativewind';
 import { useNavigation } from '@react-navigation/native';
 import apiClient from 'services/apiClient';
 import { checkUser, forgotPassword } from 'services/userService';
+import { useTheme } from 'contexts/ThemeContext';
+import { useThemeStyles } from 'contexts/ThemeUtils';
 
 export default function ForgotPassword() {
   const navigation = useNavigation();
-  const { colorScheme } = useColorScheme();
+  const { isDarkMode } = useTheme();
+  const styles = useThemeStyles();
 
   // State variables
   const [username, setUsername] = useState('');
@@ -41,7 +43,7 @@ export default function ForgotPassword() {
     }
 
     setIsLoading(true);
-      setError('');
+    setError('');
 
     try {
       const response = await checkUser(username);
@@ -57,7 +59,6 @@ export default function ForgotPassword() {
       setIsLoading(false);
     }
   };
-
 
   const handleResetPassword = async () => {
     if (!twoFactorCode || !newPassword || !confirmPassword) {
@@ -75,7 +76,7 @@ export default function ForgotPassword() {
 
     try {
       // Call API to verify 2FA and reset password
-      const response = await forgotPassword(username, Number(twoFactorCode), newPassword)
+      const response = await forgotPassword(username, Number(twoFactorCode), newPassword);
 
       if (response.ok) {
         Alert.alert('Success', 'Your password has been reset successfully', [
@@ -96,8 +97,8 @@ export default function ForgotPassword() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-bg">
-      <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
+    <SafeAreaView className={`flex-1 ${styles.bgPrimary}`}>
+      <StatusBar style={isDarkMode ? 'light' : 'dark'} />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         className="flex-1">
@@ -106,10 +107,16 @@ export default function ForgotPassword() {
             {/* Header with Back Button */}
             <View className="mb-8 flex-row items-center">
               <TouchableOpacity onPress={() => navigation.goBack()} className="mr-2 p-2">
-                <Octicons name="arrow-left" size={24} color="#6b7280" />
+                <Text>
+                  <Octicons
+                    name="arrow-left"
+                    size={24}
+                    color={isDarkMode ? '#d1d5db' : '#6b7280'}
+                  />
+                </Text>
               </TouchableOpacity>
               <View className="flex-1">
-                <Text className="text-2xl font-bold text-text">Reset Password</Text>
+                <Text className={`text-2xl font-bold ${styles.textPrimary}`}>Reset Password</Text>
               </View>
             </View>
 
@@ -120,7 +127,7 @@ export default function ForgotPassword() {
                   className={`h-8 w-8 items-center justify-center rounded-full ${currentStep >= 1 ? 'bg-accent' : 'bg-gray-300'}`}>
                   <Text className="font-bold text-white">1</Text>
                 </View>
-                <Text className="mt-1 text-xs text-text-light">Username</Text>
+                <Text className={`mt-1 text-xs ${styles.textSecondary}`}>Username</Text>
               </View>
               <View className="h-1 w-16 self-center bg-gray-200" />
               <View className={`items-center ${currentStep >= 2 ? 'opacity-100' : 'opacity-50'}`}>
@@ -128,7 +135,7 @@ export default function ForgotPassword() {
                   className={`h-8 w-8 items-center justify-center rounded-full ${currentStep >= 2 ? 'bg-accent' : 'bg-gray-300'}`}>
                   <Text className="font-bold text-white">2</Text>
                 </View>
-                <Text className="mt-1 text-xs text-text-light">Verification</Text>
+                <Text className={`mt-1 text-xs ${styles.textSecondary}`}>Verification</Text>
               </View>
             </View>
 
@@ -143,21 +150,24 @@ export default function ForgotPassword() {
             {currentStep === 1 && (
               <>
                 <View className="mb-8">
-                  <Text className="text-base text-text-light">
+                  <Text className={`text-base ${styles.textSecondary}`}>
                     Enter your username to start the password reset process.
                   </Text>
                 </View>
 
                 <View className="mb-6">
-                  <Text className="mb-2 text-sm font-semibold text-text">Username</Text>
+                  <Text className={`mb-2 text-sm font-semibold ${styles.textPrimary}`}>
+                    Username
+                  </Text>
                   <TextInput
-                    className="w-full rounded-custom border border-[#e6dff7] bg-white px-4 py-4 text-text"
+                    className={`w-full rounded-custom border border-[#e6dff7] px-4 py-4 ${styles.bgInput}`}
                     placeholder="Enter your username"
-                    placeholderTextColor="#8a7ca8"
+                    placeholderTextColor={isDarkMode ? '#9ca3af' : '#8a7ca8'}
                     value={username}
                     onChangeText={setUsername}
                     autoCapitalize="none"
                     editable={!isLoading}
+                    style={{ color: isDarkMode ? '#ffffff' : '#1f2937' }}
                   />
                 </View>
 
@@ -181,72 +191,85 @@ export default function ForgotPassword() {
             {currentStep === 2 && (
               <>
                 <View className="mb-8">
-                  <Text className="text-base text-text-light">
+                  <Text className={`text-base ${styles.textSecondary}`}>
                     Enter the 6-digit code from your authenticator app and set your new password.
                   </Text>
                 </View>
 
                 {/* 2FA Code Input */}
                 <View className="mb-6">
-                  <Text className="mb-2 text-sm font-semibold text-text">2FA Code</Text>
+                  <Text className={`mb-2 text-sm font-semibold ${styles.textPrimary}`}>
+                    2FA Code
+                  </Text>
                   <TextInput
-                    className="w-full rounded-custom border border-[#e6dff7] bg-white px-4 py-4 text-text"
+                    className={`w-full rounded-custom border border-[#e6dff7] px-4 py-4 ${styles.bgInput}`}
                     placeholder="Enter 6-digit code"
-                    placeholderTextColor="#8a7ca8"
+                    placeholderTextColor={isDarkMode ? '#9ca3af' : '#8a7ca8'}
                     value={twoFactorCode}
                     onChangeText={setTwoFactorCode}
                     keyboardType="number-pad"
                     maxLength={6}
                     editable={!isLoading}
+                    style={{ color: isDarkMode ? '#ffffff' : '#1f2937' }}
                   />
                 </View>
 
                 {/* New Password Input */}
                 <View className="mb-6">
-                  <Text className="mb-2 text-sm font-semibold text-text">New Password</Text>
+                  <Text className={`mb-2 text-sm font-semibold ${styles.textPrimary}`}>
+                    New Password
+                  </Text>
                   <View className="relative">
                     <TextInput
-                      className="w-full rounded-custom border border-[#e6dff7] bg-white px-4 py-4 text-text"
+                      className={`w-full rounded-custom border border-[#e6dff7] px-4 py-4 ${styles.bgInput}`}
                       placeholder="Enter new password"
-                      placeholderTextColor="#8a7ca8"
+                      placeholderTextColor={isDarkMode ? '#9ca3af' : '#8a7ca8'}
                       value={newPassword}
                       onChangeText={setNewPassword}
                       secureTextEntry={!showNewPassword}
                       editable={!isLoading}
+                      style={{ color: isDarkMode ? '#ffffff' : '#1f2937' }}
                     />
                     <TouchableOpacity
                       className="absolute right-4 top-4"
                       onPress={() => setShowNewPassword(!showNewPassword)}>
-                      <Octicons
-                        name={showNewPassword ? 'eye-closed' : 'eye'}
-                        size={20}
-                        color="#8a7ca8"
-                      />
+                      <Text>
+                        <Octicons
+                          name={showNewPassword ? 'eye-closed' : 'eye'}
+                          size={20}
+                          color={isDarkMode ? '#9ca3af' : '#8a7ca8'}
+                        />
+                      </Text>
                     </TouchableOpacity>
                   </View>
                 </View>
 
                 {/* Confirm Password Input */}
                 <View className="mb-6">
-                  <Text className="mb-2 text-sm font-semibold text-text">Confirm New Password</Text>
+                  <Text className={`mb-2 text-sm font-semibold ${styles.textPrimary}`}>
+                    Confirm New Password
+                  </Text>
                   <View className="relative">
                     <TextInput
-                      className="w-full rounded-custom border border-[#e6dff7] bg-white px-4 py-4 text-text"
+                      className={`w-full rounded-custom border border-[#e6dff7] px-4 py-4 ${styles.bgInput}`}
                       placeholder="Confirm new password"
-                      placeholderTextColor="#8a7ca8"
+                      placeholderTextColor={isDarkMode ? '#9ca3af' : '#8a7ca8'}
                       value={confirmPassword}
                       onChangeText={setConfirmPassword}
                       secureTextEntry={!showConfirmPassword}
                       editable={!isLoading}
+                      style={{ color: isDarkMode ? '#ffffff' : '#1f2937' }}
                     />
                     <TouchableOpacity
                       className="absolute right-4 top-4"
                       onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
-                      <Octicons
-                        name={showConfirmPassword ? 'eye-closed' : 'eye'}
-                        size={20}
-                        color="#8a7ca8"
-                      />
+                      <Text>
+                        <Octicons
+                          name={showConfirmPassword ? 'eye-closed' : 'eye'}
+                          size={20}
+                          color={isDarkMode ? '#9ca3af' : '#8a7ca8'}
+                        />
+                      </Text>
                     </TouchableOpacity>
                   </View>
                 </View>

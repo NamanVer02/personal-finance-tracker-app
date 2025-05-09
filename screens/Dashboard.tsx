@@ -1,6 +1,16 @@
-import { SafeAreaView, ScrollView, StatusBar, Text, TouchableOpacity, View, Image } from 'react-native';
+import {
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  Text,
+  TouchableOpacity,
+  View,
+  Image,
+} from 'react-native';
 import { Octicons } from '@expo/vector-icons';
 import { useUser } from 'contexts/UserContext';
+import { useTheme } from 'contexts/ThemeContext';
+import { useThemeStyles } from 'contexts/ThemeUtils';
 import { ActivityIndicator } from 'react-native';
 import AddTransactionModal from 'components/modals/AddTransactionModal';
 import { useEffect, useState, useRef } from 'react';
@@ -13,15 +23,18 @@ import DeleteTransactionModal from 'components/modals/DeleteTransactionModal';
 import { deleteTransaction, fetchFinanceDetails } from 'services/transactionService';
 import ThemeToggle from 'components/ui/theme-toggle';
 import { useNavigation } from '@react-navigation/native';
+import CsvUploadModal from 'components/modals/CsvUploadModal';
 
 export default function Dashboard() {
   const { user } = useUser();
+  const styles = useThemeStyles();
   const navigation = useNavigation();
   const swipeableRefs = useRef<{ [key: number]: Swipeable | null }>({});
 
   const [addTransactionModalVisible, setAddTransactionModalVisible] = useState(false);
   const [editTransactionModalVisible, setEditTransactionModalVisible] = useState(false);
   const [deleteTransactionModalVisible, setDeleteTransactionModalVisible] = useState(false);
+  const [csvuploadModal, setCsvuploadModal] = useState(false);
   const [transactions, setTransactions] = useState<TransactionResponseDTO | null>(null);
   const [financeDetails, setFinanceDetails] = useState<FinanceDetails | null>(null);
   const [transactionToEdit, setTransactionToEdit] = useState<Transaction | null>(null);
@@ -60,11 +73,10 @@ export default function Dashboard() {
     });
   };
 
-
   const handleDeleteTransaction = async (transaction: Transaction) => {
     try {
       await deleteTransaction(transaction.id);
-      
+
       setTransactions((prev) => {
         if (!prev) return prev;
         return {
@@ -79,14 +91,18 @@ export default function Dashboard() {
 
   const renderLeftActions = () => (
     <TouchableOpacity className="flex-1 flex-row items-center pl-6">
-      <Octicons name="pencil" size={20} color="#3B82F6" />
+      <Text>
+        <Octicons name="pencil" size={20} color="#3B82F6" />
+      </Text>
       <Text className="text-md ml-2 font-bold text-blue-900">Edit</Text>
     </TouchableOpacity>
   );
 
   const renderRightActions = () => (
     <TouchableOpacity className="flex-1 flex-row-reverse items-center pr-6">
-      <Octicons name="trash" size={20} color="#EF4444" />
+      <Text>
+        <Octicons name="trash" size={20} color="#EF4444" />
+      </Text>
       <Text className="text-md mr-2 font-bold text-red-900">Delete</Text>
     </TouchableOpacity>
   );
@@ -121,7 +137,7 @@ export default function Dashboard() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-50">
+    <SafeAreaView className={`flex-1 ${styles.bgPrimary}`}>
       <AddTransactionModal
         visible={addTransactionModalVisible}
         onClose={() => setAddTransactionModalVisible(false)}
@@ -155,12 +171,19 @@ export default function Dashboard() {
         transactionToDelete={transactionToDelete}
       />
 
-      <StatusBar barStyle="dark-content" backgroundColor="#f9fafb" />
+      <CsvUploadModal
+        visible={csvuploadModal}
+        onClose={() => setCsvuploadModal(false)}
+        onUploadSuccess={handleSyncData}
+      />
+
+      <StatusBar barStyle={styles.statusBarStyle} backgroundColor={styles.statusBarBgColor} />
       <ScrollView className="flex-1 p-4">
         {/* Header */}
         <View className="flex-row items-center justify-between px-4 pb-8 pt-2">
           <View className="flex-row items-center">
-            <View className="mr-3 h-12 w-12 overflow-hidden rounded-full border border-gray-200">
+            <View
+              className={`mr-3 h-12 w-12 overflow-hidden rounded-full border ${styles.borderColor}`}>
               {user.profileImage ? (
                 <Image
                   source={{ uri: `data:image/png;base64,${user.profileImage}` }}
@@ -176,12 +199,15 @@ export default function Dashboard() {
               )}
             </View>
             <View>
-              <Text className="text-sm text-text-light">Welcome back</Text>
-              <Text className="text-3xl font-bold text-text">{user.username}</Text>
+              <Text className={`text-sm ${styles.textSecondary}`}>Welcome back</Text>
+              <Text className={`text-3xl font-bold ${styles.textPrimary}`}>{user.username}</Text>
             </View>
           </View>
-          <TouchableOpacity className="h-10 w-10 items-center justify-center rounded-full bg-gray-100">
-            <Octicons name="bell" size={20} color="#6b7280" />
+          <TouchableOpacity
+            className={`h-10 w-10 items-center justify-center rounded-full ${styles.iconBg}`}>
+            <Text>
+              <Octicons name="bell" size={20} color={styles.iconColor} />
+            </Text>
           </TouchableOpacity>
         </View>
 
@@ -204,34 +230,45 @@ export default function Dashboard() {
         {/* Quick Actions */}
         <View className="mt-10 flex-row justify-between px-8">
           <TouchableOpacity className="items-center" onPress={handleSyncData}>
-            <View className="h-12 w-12 items-center justify-center rounded-full bg-purple-100">
-              <Octicons name="sync" size={20} color="#8b5cf6" />
+            <View className={`h-12 w-12 items-center justify-center rounded-full ${styles.iconBg}`}>
+              <Text>
+                <Octicons name="sync" size={20} color={styles.iconColor} />
+              </Text>
             </View>
-            <Text className="mt-1 text-xs text-gray-700">Sync</Text>
+            <Text className={`mt-1 text-xs ${styles.textPrimary}`}>Sync</Text>
           </TouchableOpacity>
           <TouchableOpacity
             className="items-center"
             onPress={() => setAddTransactionModalVisible(true)}>
-            <View className="h-12 w-12 items-center justify-center rounded-full bg-purple-100">
-              <Octicons name="plus" size={20} color="#8b5cf6" />
+            <View className={`h-12 w-12 items-center justify-center rounded-full ${styles.iconBg}`}>
+              <Text>
+                <Octicons name="plus" size={20} color={styles.iconColor} />
+              </Text>
             </View>
-            <Text className="mt-1 text-xs text-gray-700">Add</Text>
+            <Text className={`mt-1 text-xs ${styles.textPrimary}`}>Add</Text>
           </TouchableOpacity>
           <ThemeToggle compact></ThemeToggle>
-          <TouchableOpacity className="items-center">
-            <View className="h-12 w-12 items-center justify-center rounded-full bg-purple-100">
-              <Octicons name="note" size={20} color="#8b5cf6" />
+          <TouchableOpacity className="items-center" onPress={() => setCsvuploadModal(true)}>
+            <View className={`h-12 w-12 items-center justify-center rounded-full ${styles.iconBg}`}>
+              <Text>
+                <Octicons name="upload" size={20} color={styles.iconColor} />
+              </Text>
             </View>
-            <Text className="mt-1 text-xs text-gray-700">Loans</Text>
+            <Text className={`mt-1 text-xs ${styles.textPrimary}`}>Upload</Text>
           </TouchableOpacity>
         </View>
 
         {/* Recent Transactions */}
         <View className="mb-20 mt-14 px-4">
           <View className="mb-4 flex-row items-center justify-between">
-            <Text className="text-lg font-semibold">Recent Transactions</Text>
-            <TouchableOpacity onPress={() => {navigation.navigate('Transactions')}}>
-              <Text className="text-text">See All</Text>
+            <Text className={`text-lg font-semibold ${styles.textPrimary}`}>
+              Recent Transactions
+            </Text>
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate('Transactions');
+              }}>
+              <Text className={styles.textPrimary}>See All</Text>
             </TouchableOpacity>
           </View>
 
@@ -260,24 +297,27 @@ export default function Dashboard() {
                         setSwipedId(item.id);
                       }
                     }}>
-                    <View className="mb-3 rounded-xl bg-white p-4">
+                    <View className={`mb-3 rounded-xl ${styles.bgSecondary} p-4`}>
                       <View className="flex-row items-center">
-                        <View className="mr-3 h-10 w-10 items-center justify-center rounded-full bg-purple-100">
-                          <Octicons
-                            name={
-                              item.category === 'Salary'
-                                ? 'briefcase'
-                                : item.category === 'Food & Drinks'
-                                  ? 'flame'
-                                  : 'credit-card'
-                            }
-                            size={20}
-                            color="#8b5cf6"
-                          />
+                        <View
+                          className={`mr-3 h-10 w-10 items-center justify-center rounded-full ${styles.iconBg}`}>
+                          <Text>
+                            <Octicons
+                              name={
+                                item.category === 'Salary'
+                                  ? 'briefcase'
+                                  : item.category === 'Food & Drinks'
+                                    ? 'flame'
+                                    : 'credit-card'
+                              }
+                              size={20}
+                              color={styles.iconColor}
+                            />
+                          </Text>
                         </View>
                         <View className="flex-1">
-                          <Text className="font-medium">{item.label}</Text>
-                          <Text className="text-xs text-gray-500">
+                          <Text className={`font-medium ${styles.textPrimary}`}>{item.label}</Text>
+                          <Text className={`text-xs ${styles.textSecondary}`}>
                             {new Date(item.date).toLocaleDateString('en-US', {
                               month: 'short',
                               day: 'numeric',
@@ -296,7 +336,9 @@ export default function Dashboard() {
                   </Swipeable>
                 ))
               ) : (
-                <Text className="mt-8 text-center text-gray-400">No transactions found.</Text>
+                <Text className={`mt-8 text-center ${styles.textSecondary}`}>
+                  No transactions found.
+                </Text>
               )}
             </View>
           </GestureHandlerRootView>

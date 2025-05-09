@@ -18,7 +18,7 @@ export const fetchFinanceDataFromAPI = async (filters: FilterParams) => {
   filters.sort.forEach((sort) => params.append('sort', sort));
 
   try {
-    const response = await apiClient.get(`/api/search?${params.toString()}`);
+    const response = await apiClient.post(`/api/search?${params.toString()}`);
     return response.data;
   } catch (error) {
     console.error("Error occured while fetching data: ", error)

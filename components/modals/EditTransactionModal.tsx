@@ -1,21 +1,15 @@
 // EditTransactionModal.tsx
 import React, { useState, useEffect } from 'react';
-import {
-  Modal,
-  View,
-  Text,
-  TouchableOpacity,
-  TextInput,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-} from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, Platform } from 'react-native';
 import { Octicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Category, Transaction } from 'interfaces/types';
 import { AddTransactionModalProps } from 'interfaces/props';
 import { updateTransaction } from 'services/transactionService';
 import { TransactionDTO } from 'interfaces/dto';
+import BaseModal from './BaseModal';
+import { useTheme } from 'contexts/ThemeContext';
+import { useThemeStyles } from 'contexts/ThemeUtils';
 
 interface EditTransactionModalProps extends AddTransactionModalProps {
   transactionToEdit?: Transaction | null;
@@ -47,6 +41,8 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
   transactionToEdit,
   onEdit,
 }) => {
+  const { isDarkMode } = useTheme();
+  const styles = useThemeStyles();
   const [transactionType, setTransactionType] = useState<'Expense' | 'Income'>('Expense');
   const [label, setLabel] = useState('');
   const [amount, setAmount] = useState('');
@@ -103,7 +99,7 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
           label,
           amount: parseFloat(amount),
           category: category.name,
-          date: date.toISOString().split("T")[0],
+          date: date.toISOString().split('T')[0],
         };
         // Call your update API
         const updatedTransaction = await updateTransaction(transactionToEdit.id, updatedDTO);
@@ -114,156 +110,154 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
         return;
       }
     }
+
+    
     onClose();
   };
 
   return (
-    <Modal animationType="slide" transparent={true} visible={visible} onRequestClose={onClose}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={{ flex: 1 }}>
-        <View className="flex-1 justify-end bg-black/50">
-          <View className="h-4/5 rounded-t-3xl bg-white p-6">
-            {/* Header */}
-            <View className="mb-6 flex-row items-center justify-between">
-              <Text className="text-2xl font-bold text-gray-800">Edit Transaction</Text>
-              <TouchableOpacity onPress={onClose} className="p-2">
-                <Octicons name="x" size={24} color="#6b7280" />
-              </TouchableOpacity>
-            </View>
+    <BaseModal
+      visible={visible}
+      onClose={onClose}
+      title="Edit Transaction"
+      actionButton={{
+        label: 'Save Changes',
+        onPress: handleSave,
+      }}>
+      {/* Transaction Type Selector */}
+      <View className="mb-6 flex-row rounded-xl bg-gray-100 p-1">
+        <TouchableOpacity
+          onPress={() => setTransactionType('Expense')}
+          className={`flex-1 rounded-lg py-3 ${
+            transactionType === 'Expense' ? 'bg-purple-500' : 'bg-transparent'
+          }`}>
+          <Text
+            className={`text-center font-medium ${
+              transactionType === 'Expense' ? 'text-white' : 'text-gray-500'
+            }`}>
+            Expense
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => setTransactionType('Income')}
+          className={`flex-1 rounded-lg py-3 ${
+            transactionType === 'Income' ? 'bg-purple-500' : 'bg-transparent'
+          }`}>
+          <Text
+            className={`text-center font-medium ${
+              transactionType === 'Income' ? 'text-white' : 'text-gray-500'
+            }`}>
+            Income
+          </Text>
+        </TouchableOpacity>
+      </View>
 
-            <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
-              {/* Transaction Type Selector */}
-              <View className="mb-6 flex-row rounded-xl bg-gray-100 p-1">
-                <TouchableOpacity
-                  onPress={() => setTransactionType('Expense')}
-                  className={`flex-1 rounded-lg py-3 ${
-                    transactionType === 'Expense' ? 'bg-purple-500' : 'bg-transparent'
-                  }`}>
-                  <Text
-                    className={`text-center font-medium ${
-                      transactionType === 'Expense' ? 'text-white' : 'text-gray-500'
-                    }`}>
-                    Expense
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => setTransactionType('Income')}
-                  className={`flex-1 rounded-lg py-3 ${
-                    transactionType === 'Income' ? 'bg-purple-500' : 'bg-transparent'
-                  }`}>
-                  <Text
-                    className={`text-center font-medium ${
-                      transactionType === 'Income' ? 'text-white' : 'text-gray-500'
-                    }`}>
-                    Income
-                  </Text>
-                </TouchableOpacity>
-              </View>
-
-              {/* Amount Field */}
-              <View className="mb-6">
-                <Text className="mb-2 text-sm text-gray-500">Amount</Text>
-                <View className="flex-row items-center rounded-xl bg-gray-100 px-4 py-3">
-                  <Text className="text mr-2 text-gray-500">$</Text>
-                  <TextInput
-                    className="text flex-1"
-                    value={amount}
-                    onChangeText={setAmount}
-                    keyboardType="decimal-pad"
-                    placeholder="0.00"
-                    placeholderTextColor="#9ca3af"
-                  />
-                </View>
-              </View>
-
-              {/* Transaction Label */}
-              <View className="mb-6">
-                <Text className="mb-2 text-sm text-gray-500">Label</Text>
-                <View className="flex-row items-center rounded-xl bg-gray-100 px-4 py-3">
-                  <TextInput
-                    className="flex-1"
-                    value={label}
-                    onChangeText={setLabel}
-                    placeholder="What's this transaction for?"
-                    placeholderTextColor="#9ca3af"
-                  />
-                </View>
-              </View>
-
-              {/* Category Dropdown */}
-              <View className="mb-6">
-                <Text className="mb-2 text-sm text-gray-500">Category</Text>
-                <TouchableOpacity
-                  onPress={() => setShowCategories(!showCategories)}
-                  className="text flex-row items-center justify-between rounded-xl bg-gray-100 px-4 py-3">
-                  {category ? (
-                    <View className="flex-row items-center">
-                      <View className="mr-3 h-8 w-8 items-center justify-center rounded-full bg-purple-100">
-                        <Octicons name={category.icon} size={16} color="#8b5cf6" />
-                      </View>
-                      <Text>{category.name}</Text>
-                    </View>
-                  ) : (
-                    <Text className="text-gray-400">Select a category</Text>
-                  )}
-                  <Octicons
-                    name={showCategories ? 'chevron-up' : 'chevron-down'}
-                    size={20}
-                    color="#6b7280"
-                  />
-                </TouchableOpacity>
-
-                {/* Category List */}
-                {showCategories && (
-                  <View className="text mt-2 rounded-xl border border-gray-100 bg-white shadow-sm">
-                    {currentCategories.map((cat) => (
-                      <TouchableOpacity
-                        key={cat.id}
-                        onPress={() => {
-                          setCategory(cat);
-                          setShowCategories(false);
-                        }}
-                        className="flex-row items-center border-b border-gray-100 p-3 ">
-                        <View className="mr-3 h-8 w-8 items-center justify-center rounded-full bg-purple-100">
-                          <Octicons name={cat.icon} size={16} color="#8b5cf6" />
-                        </View>
-                        <Text>{cat.name}</Text>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
-                )}
-              </View>
-
-              {/* Date Field */}
-              <View className="mb-6">
-                <Text className="mb-2 text-sm text-gray-500">Date</Text>
-                <TouchableOpacity
-                  onPress={() => setShowDatePicker(true)}
-                  className="text flex-row items-center justify-between rounded-xl bg-gray-100 px-4 py-3">
-                  <Text className="text">{formatDate(date)}</Text>
-                  <Octicons name="calendar" size={20} color="#6b7280" />
-                </TouchableOpacity>
-
-                {showDatePicker && (
-                  <DateTimePicker
-                    value={date}
-                    mode="date"
-                    display="default"
-                    onChange={handleDateChange}
-                  />
-                )}
-              </View>
-            </ScrollView>
-
-            {/* Save Button */}
-            <TouchableOpacity onPress={handleSave} className="mt-4 rounded-xl bg-purple-500 py-4">
-              <Text className="text-center text-lg font-semibold text-white">Save Transaction</Text>
-            </TouchableOpacity>
-          </View>
+      {/* Amount Field */}
+      <View className="mb-6">
+        <Text className={`mb-2 text-sm ${styles.textSecondary}`}>Amount</Text>
+        <View className={`flex-row items-center rounded-xl ${styles.bgInput} px-4 py-3`}>
+          <Text className={`mr-2 ${styles.textSecondary}`}>$</Text>
+          <TextInput
+            className={`flex-1 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}
+            value={amount}
+            onChangeText={setAmount}
+            keyboardType="decimal-pad"
+            placeholder="0.00"
+            placeholderTextColor={isDarkMode ? '#9ca3af' : '#9ca3af'}
+          />
         </View>
-      </KeyboardAvoidingView>
-    </Modal>
+      </View>
+
+      {/* Transaction Label */}
+      <View className="mb-6">
+        <Text className={`mb-2 text-sm ${styles.textSecondary}`}>Label</Text>
+        <View className={`flex-row items-center rounded-xl ${styles.bgInput} px-4 py-3`}>
+          <TextInput
+            className={`flex-1 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}
+            value={label}
+            onChangeText={setLabel}
+            placeholder="What's this transaction for?"
+            placeholderTextColor={isDarkMode ? '#9ca3af' : '#9ca3af'}
+          />
+        </View>
+      </View>
+
+      {/* Category Dropdown */}
+      <View className="mb-6">
+        <Text className={`mb-2 text-sm ${styles.textSecondary}`}>Category</Text>
+        <TouchableOpacity
+          onPress={() => setShowCategories(!showCategories)}
+          className={`flex-row items-center justify-between rounded-xl ${styles.bgInput} px-4 py-3`}>
+          {category ? (
+            <View className="flex-row items-center">
+              <View
+                className={`mr-3 h-8 w-8 items-center justify-center rounded-full ${styles.iconBg}`}>
+                <Text>
+                  <Octicons name={category.icon} size={16} color={styles.iconColor} />
+                </Text>
+              </View>
+              <Text className={styles.textPrimary}>{category.name}</Text>
+            </View>
+          ) : (
+            <Text className={styles.textMuted}>Select a category</Text>
+          )}
+          <Text>
+            <Octicons
+              name={showCategories ? 'chevron-up' : 'chevron-down'}
+              size={20}
+              color={isDarkMode ? '#d1d5db' : '#6b7280'}
+            />
+          </Text>
+        </TouchableOpacity>
+
+        {/* Category List */}
+        {showCategories && (
+          <View
+            className={`mt-2 rounded-xl border ${styles.borderColor} ${styles.bgSecondary} shadow-sm`}>
+            {currentCategories.map((cat) => (
+              <TouchableOpacity
+                key={cat.id}
+                onPress={() => {
+                  setCategory(cat);
+                  setShowCategories(false);
+                }}
+                className={`flex-row items-center border-b ${styles.borderColor} p-3`}>
+                <View
+                  className={`mr-3 h-8 w-8 items-center justify-center rounded-full ${styles.iconBg}`}>
+                  <Text>
+                    <Octicons name={cat.icon} size={16} color={styles.iconColor} />
+                  </Text>
+                </View>
+                <Text className={styles.textPrimary}>{cat.name}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+      </View>
+
+      {/* Date Field */}
+      <View className="mb-6">
+        <Text className={`mb-2 text-sm ${styles.textSecondary}`}>Date</Text>
+        <TouchableOpacity
+          onPress={() => setShowDatePicker(true)}
+          className={`flex-row items-center justify-between rounded-xl ${styles.bgInput} px-4 py-3`}>
+          <Text className={styles.textPrimary}>{formatDate(date)}</Text>
+          <Text>
+            <Octicons name="calendar" size={20} color={isDarkMode ? '#d1d5db' : '#6b7280'} />
+          </Text>
+        </TouchableOpacity>
+
+        {showDatePicker && (
+          <DateTimePicker
+            value={date}
+            mode="date"
+            display="default"
+            onChange={handleDateChange}
+            themeVariant={isDarkMode ? 'dark' : 'light'}
+          />
+        )}
+      </View>
+    </BaseModal>
   );
 };
 

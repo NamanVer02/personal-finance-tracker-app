@@ -2,12 +2,14 @@
 module.exports = {
   // Include paths to all your component files
   content: [
-    "./app/**/*.{js,jsx,ts,tsx}", 
-    "./components/**/*.{js,jsx,ts,tsx}", 
-    "./App/**/*.{js,jsx,ts,tsx}", "./*.tsx",
-    "./screens/**/*.{js,jsx,ts,tsx}",
+    './app/**/*.{js,jsx,ts,tsx}',
+    './components/**/*.{js,jsx,ts,tsx}',
+    './App/**/*.{js,jsx,ts,tsx}',
+    './*.tsx',
+    './screens/**/*.{js,jsx,ts,tsx}',
   ],
-  presets: [require("nativewind/preset")],
+  darkMode: 'class', // Enable dark mode with class strategy
+  presets: [require('nativewind/preset')],
   theme: {
     extend: {
       colors: {

@@ -1,13 +1,10 @@
-import { View, Dimensions, Pressable } from 'react-native';
+import { View, Dimensions, Pressable, Text } from 'react-native';
 import { useEffect } from 'react';
-import Animated, {
-  runOnUI,
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from 'react-native-reanimated';
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { Octicons } from '@expo/vector-icons';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
+import { useTheme } from 'contexts/ThemeContext';
+import { useThemeStyles } from 'contexts/ThemeUtils';
 
 // Define routes with icons for 4 screens
 export const routes = {
@@ -18,104 +15,108 @@ export const routes = {
 };
 
 const { width } = Dimensions.get('window');
-const FIXED_WIDTH = width * 0.7;
-const ICON_SIZE = 40;
-const ICON_GAP = 24;
-const ICONS_TOTAL_WIDTH = ICON_SIZE * 4 + ICON_GAP * 3;
-const SIDE_PADDING = (FIXED_WIDTH - ICONS_TOTAL_WIDTH) / 2;
-const HIGHLIGHT_SIZE = ICON_SIZE;
+const TAB_BAR_WIDTH = width * 0.75;
+const ICONS_CONTAINER_WIDTH = width * 0.6;
+const NUM_TABS = 4;
+const TAB_WIDTH = ICONS_CONTAINER_WIDTH / NUM_TABS;
+const ICON_SIZE = 24;
+const HIGHLIGHT_SIZE = 40;
 
 const TabBar: React.FC<BottomTabBarProps> = ({ state, navigation, descriptors }) => {
+  const { isDarkMode } = useTheme();
+  const styles = useThemeStyles();
   const translateX = useSharedValue(0);
   const focusedTab = state.index;
 
-  const handleAnimate = (index: number) => {
-    'worklet';
-    // Calculate position based on icon size and gaps
-    const newTranslateX = SIDE_PADDING + index * (ICON_SIZE + ICON_GAP);
-
-    translateX.value = withTiming(newTranslateX, {
-      duration: 300,
-    });
-  };
-
   useEffect(() => {
-    runOnUI(handleAnimate)(focusedTab);
-  }, [focusedTab]);
+    // Calculate the center position of the tab
+    const newPosition = focusedTab * TAB_WIDTH + TAB_WIDTH / 2 - HIGHLIGHT_SIZE / 2;
+    translateX.value = withTiming(newPosition, { duration: 300 });
+  }, [focusedTab, translateX]);
 
-  const rnStyle = useAnimatedStyle(() => {
+  const highlightStyle = useAnimatedStyle(() => {
     return {
       transform: [{ translateX: translateX.value }],
       width: HIGHLIGHT_SIZE,
       height: HIGHLIGHT_SIZE,
       borderRadius: HIGHLIGHT_SIZE / 2,
-      shadowOpacity: 0,
+      position: 'absolute',
+      backgroundColor: isDarkMode ? '#374151' : '#ede9fe',
     };
   });
 
   return (
     <View
-      className="absolute bottom-6 z-50 h-[60px] flex-row items-center rounded-[32px] bg-white shadow-sm shadow-black/10"
+      className={`absolute bottom-6 flex-row items-center justify-center rounded-[32px] shadow-md shadow-black/10 ${
+        isDarkMode ? 'bg-gray-800' : 'bg-white'
+      }`}
       style={{
-        width: FIXED_WIDTH,
-        left: (width - FIXED_WIDTH) / 2,
-        paddingLeft: SIDE_PADDING,
-        paddingRight: SIDE_PADDING,
+        width: TAB_BAR_WIDTH,
+        left: (width - TAB_BAR_WIDTH) / 2,
+        paddingVertical: 10,
       }}>
-      <Animated.View className="absolute z-0 bg-purple-100" style={rnStyle} />
-      {state.routes.map((route, index) => {
-        const { options } = descriptors[route.key];
-        const isFocused = state.index === index;
+      <View
+        style={{
+          width: ICONS_CONTAINER_WIDTH,
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          position: 'relative',
+        }}>
+        <Animated.View style={highlightStyle} />
+        {state.routes.map((route, index) => {
+          const { options } = descriptors[route.key];
+          const isFocused = state.index === index;
 
-        const onPress = () => {
-          const event = navigation.emit({
-            type: 'tabPress',
-            target: route.key,
-            canPreventDefault: true,
-          });
-
-          if (!isFocused && !event.defaultPrevented) {
-            navigation.navigate({
-              name: route.name,
-              merge: true,
-              params: {},
+          const onPress = () => {
+            const event = navigation.emit({
+              type: 'tabPress',
+              target: route.key,
+              canPreventDefault: true,
             });
-          }
-        };
 
-        const onLongPress = () => {
-          navigation.emit({
-            type: 'tabLongPress',
-            target: route.key,
-          });
-        };
+            if (!isFocused && !event.defaultPrevented) {
+              navigation.navigate({
+                name: route.name,
+                merge: true,
+                params: {},
+              });
+            }
+          };
 
-        // Use route.name in lowercase to index routes object
-        const routeName = route.name.toLowerCase().replace(/\s+/g, '') as keyof typeof routes;
-        const icon = routes[routeName]?.icon || 'question';
+          const onLongPress = () => {
+            navigation.emit({
+              type: 'tabLongPress',
+              target: route.key,
+            });
+          };
 
-        // Apply right margin to all items except the last one
-        const marginRight = index < state.routes.length - 1 ? ICON_GAP : 0;
+          // Use route.name in lowercase to index routes object
+          const routeName = route.name.toLowerCase().replace(/\s+/g, '') as keyof typeof routes;
+          const icon = routes[routeName]?.icon || 'question';
 
-        return (
-          <Pressable
-            key={`route-${index}`}
-            accessibilityRole="button"
-            accessibilityState={isFocused ? { selected: true } : {}}
-            accessibilityLabel={options.tabBarAccessibilityLabel}
-            testID={options.tabBarButtonTestID}
-            onPress={onPress}
-            onLongPress={onLongPress}
-            style={{
-              width: ICON_SIZE,
-              height: ICON_SIZE,
-              marginRight: marginRight,
-            }}
-            className="items-center justify-center">
-            <Octicons name={icon as any} size={24} color={isFocused ? '#8b5cf6' : '#A9A9A9'} />
-          </Pressable>
-        );
-      })}
+          return (
+            <Pressable
+              key={`route-${index}`}
+              accessibilityRole="button"
+              accessibilityState={isFocused ? { selected: true } : {}}
+              accessibilityLabel={options.tabBarAccessibilityLabel}
+              testID={options.tabBarButtonTestID}
+              onPress={onPress}
+              onLongPress={onLongPress}
+              style={{ width: TAB_WIDTH, height: HIGHLIGHT_SIZE }}
+              className="items-center justify-center">
+              <Text>
+                <Octicons
+                  name={icon as any}
+                  size={ICON_SIZE}
+                  color={isFocused ? styles.iconColor : isDarkMode ? '#6b7280' : '#A9A9A9'}
+                />
+              </Text>
+            </Pressable>
+          );
+        })}
+      </View>
     </View>
   );
 };

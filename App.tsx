@@ -13,6 +13,8 @@ import Profile from './screens/Profile';
 import TabBar from './components/ui/TabBar';
 import type { RootStackParamList } from './interfaces/types';
 import { UserProvider, useUser } from './contexts/UserContext';
+import { ThemeProvider } from './contexts/ThemeContext';
+import ThemeWrapper from './components/ui/ThemeWrapper';
 import Analytics from 'screens/Analytics';
 import GoogleAuthSetup from 'screens/GoogleAuthSetup';
 import ForgotPassword from 'screens/ForgotPassword';
@@ -28,7 +30,7 @@ function BottomTabNavigator() {
       screenOptions={{ headerShown: false }}>
       <BottomTab.Screen name="Dashboard" component={Dashboard} />
       <BottomTab.Screen name="Analytics" component={Analytics} />
-      <BottomTab.Screen name="Transactions" component={Transactions}/>
+      <BottomTab.Screen name="Transactions" component={Transactions} />
       <BottomTab.Screen name="Profile" component={Profile} />
     </BottomTab.Navigator>
   );
@@ -73,9 +75,13 @@ function AppLoader() {
 export default function App() {
   return (
     <SafeAreaProvider>
-      <UserProvider>
-        <AppLoader />
-      </UserProvider>
+      <ThemeProvider>
+        <UserProvider>
+          <ThemeWrapper>
+            <AppLoader />
+          </ThemeWrapper>
+        </UserProvider>
+      </ThemeProvider>
     </SafeAreaProvider>
   );
 }
