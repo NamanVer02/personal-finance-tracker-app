@@ -66,27 +66,27 @@ function AppLoader() {
         <Stack.Screen
           name="Login"
           component={Login}
-          options={{ headerShown: false, animation: 'slide_from_left' }}
+          options={{ headerShown: false, animation: 'slide_from_right' }}
         />
         <Stack.Screen
           name="Register"
           component={Register}
-          options={{ headerShown: false, animation: 'slide_from_left' }}
+          options={{ headerShown: false, animation: 'slide_from_right' }}
         />
         <Stack.Screen
           name="GoogleAuthSetup"
           component={GoogleAuthSetup}
-          options={{ headerShown: false, animation: 'slide_from_left' }}
+          options={{ headerShown: false, animation: 'slide_from_right' }}
         />
         <Stack.Screen
           name="ForgotPassword"
           component={ForgotPassword}
-          options={{ headerShown: false, animation: 'slide_from_left' }}
+          options={{ headerShown: false, animation: 'slide_from_right' }}
         />
         <Stack.Screen
           name="Main"
           component={BottomTabNavigator}
-          options={{ headerShown: false, animation: 'slide_from_left' }}
+          options={{ headerShown: false, animation: 'slide_from_right' }}
         />
       </Stack.Navigator>
     </NavigationContainer>

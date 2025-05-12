@@ -108,7 +108,7 @@ export default function ForgotPassword() {
         <ScrollView contentContainerStyle={{ flexGrow: 1 }} className="px-6 py-10">
           <View className="mx-auto w-full max-w-[420px]">
             {/* Header with Back Button */}
-            <View className="mb-8 flex-row items-center">
+            <View className="mb-6 flex-row items-center">
               <TouchableOpacity onPress={() => navigation.goBack()} className="mr-2 p-2">
                 <Text>
                   <Octicons
@@ -294,7 +294,7 @@ export default function ForgotPassword() {
             )}
 
             {/* Back to Login */}
-            <TouchableOpacity className="mt-6" onPress={() => navigation.navigate('Login')}>
+            <TouchableOpacity className="mt-6" onPress={() => navigation.goBack()}>
               <Text className="text-center font-medium text-accent">Back to Login</Text>
             </TouchableOpacity>
           </View>

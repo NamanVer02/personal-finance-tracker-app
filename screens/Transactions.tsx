@@ -11,9 +11,10 @@ import {
 import { Octicons } from '@expo/vector-icons';
 import { fetchAllTransactions } from 'services/transactionService';
 import { useNavigation } from '@react-navigation/native';
-import { Transaction } from 'interfaces/types';
+import { Transaction, FetchAllTransactionParams } from 'interfaces/types';
 import { useTheme } from 'contexts/ThemeContext';
 import { useThemeStyles } from 'contexts/ThemeUtils';
+import FilterModal from 'components/modals/FilterModal';
 
 const Transactions = () => {
   const navigation = useNavigation();
@@ -29,15 +30,22 @@ const Transactions = () => {
     totalElements: 0,
   });
   const [currentPage, setCurrentPage] = useState(0); // API uses 0-based indexing
+  const [filterModalVisible, setFilterModalVisible] = useState(false);
+
+  // Filter states
+  const [filters, setFilters] = useState<FetchAllTransactionParams>({});
 
   useEffect(() => {
     loadTransactions();
-  }, [currentPage]);
+  }, [currentPage, filters]);
 
   const loadTransactions = async () => {
     try {
       setLoading(true);
-      const response = await fetchAllTransactions({ page: currentPage });
+      const response = await fetchAllTransactions({
+        page: currentPage,
+        ...filters,
+      });
       setTransactionsData(response);
     } catch (error) {
       console.error('Error loading transactions:', error);
@@ -53,7 +61,17 @@ const Transactions = () => {
     } finally {
       setRefreshing(false);
     }
-  }, [currentPage]);
+  }, [currentPage, filters]);
+
+  const applyFilters = (newFilters: FetchAllTransactionParams) => {
+    setFilters(newFilters);
+    setCurrentPage(0); // Reset to first page when applying filters
+  };
+
+  const resetFilters = () => {
+    setFilters({});
+    setCurrentPage(0);
+  };
 
   const getCategoryIcon = (category: string) => {
     switch (category) {
@@ -114,9 +132,15 @@ const Transactions = () => {
           </Text>
         </TouchableOpacity>
         <Text className={`text-xl font-bold ${styles.textPrimary}`}>All Transactions</Text>
-        <TouchableOpacity className="p-2">
+        <TouchableOpacity className="p-2" onPress={() => setFilterModalVisible(true)}>
           <Text>
-            <Octicons name="filter" size={24} color={isDarkMode ? '#d1d5db' : '#6b7280'} />
+            <Octicons
+              name="filter"
+              size={24}
+              color={
+                Object.keys(filters).length > 0 ? '#8b5cf6' : isDarkMode ? '#d1d5db' : '#6b7280'
+              }
+            />
           </Text>
         </TouchableOpacity>
       </View>
@@ -130,6 +154,20 @@ const Transactions = () => {
             tintColor="#8b5cf6"
           />
         }>
+        {/* Filters indicator */}
+        {Object.keys(filters).length > 0 && (
+          <View
+            className={`mx-6 mb-4 rounded-lg p-3 ${isDarkMode ? 'bg-purple-900/30' : 'bg-purple-100'}`}>
+            <Text
+              className={`text-sm font-medium ${isDarkMode ? 'text-purple-300' : 'text-purple-600'}`}>
+              Filters applied •{' '}
+              <TouchableOpacity onPress={resetFilters}>
+                <Text className="underline">Reset</Text>
+              </TouchableOpacity>
+            </Text>
+          </View>
+        )}
+
         <View className="mb-6">
           {loading ? (
             <View className="my-10 items-center justify-center">
@@ -205,6 +243,15 @@ const Transactions = () => {
           )}
         </View>
       </ScrollView>
+
+      {/* Filter Modal */}
+      <FilterModal
+        visible={filterModalVisible}
+        onClose={() => setFilterModalVisible(false)}
+        filters={filters}
+        onApplyFilters={applyFilters}
+        onResetFilters={resetFilters}
+      />
     </SafeAreaView>
   );
 };

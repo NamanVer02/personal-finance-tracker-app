@@ -248,7 +248,7 @@ export default function Register() {
                   Already have an account?{' '}
                   <Text
                     className="font-medium text-accent"
-                    onPress={() => navigation.navigate('Login')}>
+                    onPress={() => navigation.goBack()}>
                     Sign in
                   </Text>
                 </Text>
