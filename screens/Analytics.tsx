@@ -307,8 +307,8 @@ export default function FinancialAnalysisScreen() {
         <View className="mb-4">
           <PieChart
             data={pieData}
-            width={screenWidth - 96}
-            height={180}
+            width={screenWidth + 148}
+            height={screenWidth - 148}
             chartConfig={{
               backgroundColor: 'transparent',
               backgroundGradientFrom: 'transparent',

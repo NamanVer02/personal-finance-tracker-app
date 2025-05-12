@@ -1,6 +1,6 @@
 import './global.css';
 import React, { useEffect, useState } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -13,7 +13,7 @@ import Profile from './screens/Profile';
 import TabBar from './components/ui/TabBar';
 import type { RootStackParamList } from './interfaces/types';
 import { UserProvider, useUser } from './contexts/UserContext';
-import { ThemeProvider } from './contexts/ThemeContext';
+import { ThemeProvider, useTheme } from './contexts/ThemeContext';
 import ThemeWrapper from './components/ui/ThemeWrapper';
 import Analytics from 'screens/Analytics';
 import GoogleAuthSetup from 'screens/GoogleAuthSetup';
@@ -38,6 +38,7 @@ function BottomTabNavigator() {
 
 function AppLoader() {
   const { user, setUser } = useUser();
+  const { isDarkMode } = useTheme();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -60,7 +61,7 @@ function AppLoader() {
   }
 
   return (
-    <NavigationContainer>
+    <NavigationContainer theme={isDarkMode ? DarkTheme : DefaultTheme}>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen
           name="Login"
