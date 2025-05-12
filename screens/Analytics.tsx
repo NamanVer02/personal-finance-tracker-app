@@ -9,6 +9,7 @@ import {
   StatusBar,
   SafeAreaView,
   RefreshControl,
+  StatusBarStyle,
 } from 'react-native';
 import { Octicons } from '@expo/vector-icons';
 import { useAnalyticsData } from '../hooks/useAnalyticsData';
@@ -18,7 +19,6 @@ import { Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useTheme } from 'contexts/ThemeContext';
 import { useThemeStyles } from 'contexts/ThemeUtils';
-import ThemeToggle from 'components/ui/theme-toggle';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -81,7 +81,8 @@ export default function FinancialAnalysisScreen() {
   }, []);
 
   const renderDateRangeSelector = () => (
-    <View className={`mx-4 mb-6 flex-row justify-center rounded-full ${styles.bgSecondary} p-1`}>
+    <View
+      className={`mx-4 mb-6 flex-row justify-center rounded-full ${styles.bgSecondary} p-1`}>
       <TouchableOpacity
         className={`flex-1 rounded-full py-2 ${dateRange === 'week' ? 'bg-purple-500' : 'bg-transparent'}`}
         onPress={() => updateDateRange('week')}>
@@ -118,7 +119,8 @@ export default function FinancialAnalysisScreen() {
   const renderSummaryCards = () => (
     <View className="mb-6 flex-row justify-between px-4">
       <View className={`w-[47%] rounded-xl ${styles.bgSecondary} p-4`}>
-        <View className="mb-2 h-8 w-8 items-center justify-center rounded-full bg-green-100">
+        <View
+          className={`mb-2 h-8 w-8 items-center justify-center rounded-full ${isDarkMode ? 'bg-green-900/30' : 'bg-green-100'}`}>
           <Text>
             <Octicons name="arrow-down" size={16} color="#10b981" />
           </Text>
@@ -130,7 +132,8 @@ export default function FinancialAnalysisScreen() {
       </View>
 
       <View className={`w-[47%] rounded-xl ${styles.bgSecondary} p-4`}>
-        <View className="mb-2 h-8 w-8 items-center justify-center rounded-full bg-red-100">
+        <View
+          className={`mb-2 h-8 w-8 items-center justify-center rounded-full ${isDarkMode ? 'bg-red-900/30' : 'bg-red-100'}`}>
           <Text>
             <Octicons name="arrow-up" size={16} color="#ef4444" />
           </Text>
@@ -175,21 +178,32 @@ export default function FinancialAnalysisScreen() {
           yAxisLabel="$"
           yAxisSuffix=""
           chartConfig={{
-            backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
-            backgroundGradientFrom: isDarkMode ? '#1f2937' : '#ffffff',
-            backgroundGradientTo: isDarkMode ? '#1f2937' : '#ffffff',
+            backgroundColor: '#fff',
+            backgroundGradientFrom: '#fff',
+            backgroundGradientTo: '#fff',
+            backgroundGradientFromOpacity: 0,
+            backgroundGradientToOpacity: 0,
             decimalPlaces: 0,
             color: (opacity = 1) =>
               isDarkMode ? `rgba(255, 255, 255, ${opacity})` : `rgba(0, 0, 0, ${opacity})`,
             labelColor: (opacity = 1) =>
               isDarkMode ? `rgba(255, 255, 255, ${opacity})` : `rgba(0, 0, 0, ${opacity})`,
-            style: {
-              borderRadius: 16,
+            propsForBackgroundLines: {
+              stroke: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+              strokeDasharray: '0',
             },
+            barPercentage: 0.65,
+            // Add these properties to control bar color
+            fillShadowGradient: isDarkMode ? '#9CA3AF' : '#9CA3AF',
+            fillShadowGradientOpacity: 0.2,
           }}
+          withInnerLines={false}
+          showValuesOnTopOfBars={false}
+          fromZero
+          withHorizontalLabels={true}
           style={{
-            marginVertical: 8,
             borderRadius: 16,
+            backgroundColor: 'transparent',
           }}
         />
       </View>
@@ -222,10 +236,12 @@ export default function FinancialAnalysisScreen() {
           width={screenWidth - 96}
           height={220}
           chartConfig={{
-            backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
-            backgroundGradientFrom: isDarkMode ? '#1f2937' : '#ffffff',
-            backgroundGradientTo: isDarkMode ? '#1f2937' : '#ffffff',
+            backgroundColor: 'transparent',
+            backgroundGradientFrom: 'transparent',
+            backgroundGradientTo: 'transparent',
             color: (opacity = 1) =>
+              isDarkMode ? `rgba(255, 255, 255, ${opacity})` : `rgba(0, 0, 0, ${opacity})`,
+            labelColor: (opacity = 1) =>
               isDarkMode ? `rgba(255, 255, 255, ${opacity})` : `rgba(0, 0, 0, ${opacity})`,
           }}
           accessor="amount"
@@ -233,6 +249,10 @@ export default function FinancialAnalysisScreen() {
           paddingLeft="15"
           absolute
           hasLegend={true}
+          style={{
+            borderRadius: 16,
+            backgroundColor: 'transparent',
+          }}
         />
 
         <View className="mt-4">
@@ -285,11 +305,16 @@ export default function FinancialAnalysisScreen() {
   }
 
   return (
-    <SafeAreaView className={`flex-1 ${styles.bgPrimary}`}>
-      <StatusBar barStyle={styles.statusBarStyle} backgroundColor={styles.statusBarBgColor} />
+    <SafeAreaView
+      className={`flex-1 ${styles.bgPrimary}`}
+      style={{ backgroundColor: isDarkMode ? '#1f2937' : '#f9fafb' }}>
+      <StatusBar
+        barStyle={isDarkMode ? 'light-content' : ('dark-content' as StatusBarStyle)}
+        backgroundColor={isDarkMode ? '#1f2937' : '#f9fafb'}
+      />
 
       {/* Header */}
-      <View className="mb-6 flex-row items-center justify-between px-4">
+      <View className="mb-6 mt-4 flex-row items-center justify-between px-4">
         <TouchableOpacity className="p-2" onPress={() => navigation.goBack()}>
           <Text>
             <Octicons name="arrow-left" size={24} color={isDarkMode ? '#d1d5db' : '#6b7280'} />

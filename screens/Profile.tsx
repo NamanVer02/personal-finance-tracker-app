@@ -3,6 +3,7 @@ import {
   SafeAreaView,
   ScrollView,
   StatusBar,
+  StatusBarStyle,
   Text,
   TouchableOpacity,
   View,
@@ -114,16 +115,16 @@ export default function Profile() {
   }
 
   return (
-    <SafeAreaView className={`flex-1 ${styles.bgPrimary}`}>
+    <SafeAreaView
+      className={`flex-1 ${styles.bgPrimary}`}
+      style={{ backgroundColor: isDarkMode ? '#1f2937' : '#f9fafb' }}>
       <UpdatePasswordModal
         visible={isPasswordModalVisible}
         onClose={() => setIsPasswordModalVisible(false)}
       />
-
-      <StatusBar barStyle={styles.statusBarStyle} backgroundColor={styles.statusBarBgColor} />
       <ScrollView className="flex-1">
         {/* Header */}
-        <View className="flex-row items-center justify-between px-4">
+        <View className="mt-4 flex-row items-center justify-between px-4">
           <TouchableOpacity className="p-2" onPress={() => navigation.goBack()}>
             <Text>
               <Octicons name="arrow-left" size={24} color={isDarkMode ? '#d1d5db' : '#6b7280'} />
@@ -172,12 +173,13 @@ export default function Profile() {
         </View>
 
         {/* Account Settings Section */}
-        <View className={`mx-6 mt-8 rounded-2xl ${styles.bgSecondary} p-4`}>
+        <View className={`mx-6 mt-8 rounded-2xl p-4 ${styles.bgSecondary}`}>
           <Text className={`mb-4 text-lg font-semibold ${styles.textPrimary}`}>
             Account Settings
           </Text>
 
-          <TouchableOpacity className={`flex-row items-center border-b ${styles.borderColor} py-4`}>
+          <TouchableOpacity className={`flex-row items-center border-b py-4 ${isDarkMode ?
+            'border-gray-700' : 'border-gray-200'}`}>
             <View
               className={`mr-4 h-10 w-10 items-center justify-center rounded-full ${styles.iconBg}`}>
               <Text>
@@ -231,7 +233,7 @@ export default function Profile() {
         </TouchableOpacity>
 
         <View className="mb-8 items-center">
-          <Text className={`text-sm ${styles.textMuted}`}>App Version 1.0.0</Text>
+          <Text className={`text-sm ${styles.textSecondary}`}>App Version 1.0.0</Text>
         </View>
       </ScrollView>
     </SafeAreaView>

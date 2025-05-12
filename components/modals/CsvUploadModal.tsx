@@ -144,19 +144,22 @@ const CsvUploadModal = ({ visible, onClose, onUploadSuccess }: CsvUploadModalPro
     if (!preview) return null;
 
     return (
-      <View className={`mt-4 rounded-xl border ${styles.borderColor} p-4`}>
+      <View
+        className={`mt-4 rounded-xl border ${styles.borderColor} p-4`}
+        style={{ backgroundColor: isDarkMode ? '#374151' : '#f9fafb' }}>
         <Text className={`mb-2 font-bold ${styles.textPrimary}`}>File Summary:</Text>
 
         {/* File information */}
         <View className="mb-3">
           <Text className={`${styles.textSecondary}`}>
-            <Text className="font-semibold">Filename:</Text> {file.name}
+            <Text className={`font-semibold ${styles.textPrimary}`}>Filename:</Text> {file.name}
           </Text>
           <Text className={`${styles.textSecondary}`}>
-            <Text className="font-semibold">Size:</Text> {(file.size / 1024).toFixed(2)} KB
+            <Text className={`font-semibold ${styles.textPrimary}`}>Size:</Text>{' '}
+            {(file.size / 1024).toFixed(2)} KB
           </Text>
           <Text className={`${styles.textSecondary}`}>
-            <Text className="font-semibold">Records:</Text> {entryCount}
+            <Text className={`font-semibold ${styles.textPrimary}`}>Records:</Text> {entryCount}
           </Text>
         </View>
 
@@ -180,7 +183,7 @@ const CsvUploadModal = ({ visible, onClose, onUploadSuccess }: CsvUploadModalPro
   return (
     <BaseModal
       visible={visible}
-      onClose={() => {}}
+      onClose={onClose}
       title="Import Transactions"
       actionButton={{
         label: loading ? 'Uploading...' : 'Import Transactions',
@@ -197,7 +200,8 @@ const CsvUploadModal = ({ visible, onClose, onUploadSuccess }: CsvUploadModalPro
         onPress={handleFilePick}
         className={`mb-6 items-center justify-center rounded-xl border-2 border-dashed ${
           isDarkMode ? 'border-gray-600' : 'border-gray-300'
-        } p-6`}>
+        } p-6`}
+        style={{ backgroundColor: isDarkMode ? '#374151' : '#f9fafb' }}>
         <Text>
           <Octicons name="upload" size={40} color={isDarkMode ? '#9ca3af' : '#9ca3af'} />
         </Text>
@@ -215,7 +219,9 @@ const CsvUploadModal = ({ visible, onClose, onUploadSuccess }: CsvUploadModalPro
           <Text>
             <Octicons name="alert" size={16} color="#ef4444" />
           </Text>
-          <Text className="ml-2 text-sm text-red-600">{error}</Text>
+          <Text className={`ml-2 text-sm ${isDarkMode ? 'text-red-400' : 'text-red-600'}`}>
+            {error}
+          </Text>
         </View>
       ) : null}
 

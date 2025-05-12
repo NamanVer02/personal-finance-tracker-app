@@ -50,7 +50,7 @@ export default function ForgotPassword() {
       if (response.ok) {
         setCurrentStep(2);
       } else {
-        setError('Username not found. Please check and try again.');
+        setError(response.message || 'Some error occured. Please try again');
       }
     } catch (error) {
       console.error('Error checking username:', error);
@@ -97,7 +97,10 @@ export default function ForgotPassword() {
   };
 
   return (
-    <SafeAreaView className={`flex-1 ${styles.bgPrimary}`}>
+    <SafeAreaView 
+      className={`flex-1 ${styles.bgPrimary}`}
+      style={{ backgroundColor: isDarkMode ? '#1f2937' : '#f9fafb' }}
+    >
       <StatusBar style={isDarkMode ? 'light' : 'dark'} />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -141,8 +144,8 @@ export default function ForgotPassword() {
 
             {/* Error message if any */}
             {error ? (
-              <View className="mb-4 rounded-xl bg-red-100 p-3">
-                <Text className="text-red-600">{error}</Text>
+              <View className={`mb-4 rounded-xl ${isDarkMode ? 'bg-red-900/30' : 'bg-red-100'} p-3`}>
+                <Text className={isDarkMode ? 'text-red-300' : 'text-red-600'}>{error}</Text>
               </View>
             ) : null}
 

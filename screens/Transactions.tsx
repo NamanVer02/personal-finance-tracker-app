@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   SafeAreaView,
   ActivityIndicator,
-  StatusBar,
+  RefreshControl,
 } from 'react-native';
 import { Octicons } from '@expo/vector-icons';
 import { fetchAllTransactions } from 'services/transactionService';
@@ -21,6 +21,7 @@ const Transactions = () => {
   const styles = useThemeStyles();
 
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [transactionsData, setTransactionsData] = useState({
     content: [],
     totalPages: 0,
@@ -44,6 +45,15 @@ const Transactions = () => {
       setLoading(false);
     }
   };
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await loadTransactions();
+    } finally {
+      setRefreshing(false);
+    }
+  }, [currentPage]);
 
   const getCategoryIcon = (category: string) => {
     switch (category) {
@@ -93,32 +103,43 @@ const Transactions = () => {
   };
 
   return (
-    <SafeAreaView className={`flex-1 ${styles.bgPrimary}`}>
-      <StatusBar barStyle={styles.statusBarStyle} backgroundColor={styles.statusBarBgColor} />
-      <ScrollView className="flex-1">
-        <View className="mb-6 mt-4">
-          {/* Header */}
-          <View className="mb-6 flex-row items-center justify-between px-4">
-            <TouchableOpacity className="p-2" onPress={() => navigation.goBack()}>
-              <Text>
-                <Octicons name="arrow-left" size={24} color={isDarkMode ? '#d1d5db' : '#6b7280'} />
-              </Text>
-            </TouchableOpacity>
-            <Text className={`text-xl font-bold ${styles.textPrimary}`}>All Transactions</Text>
-            <TouchableOpacity className="p-2" onPress={loadTransactions}>
-              <Text>
-                <Octicons name="sync" size={24} color={isDarkMode ? '#d1d5db' : '#6b7280'} />
-              </Text>
-            </TouchableOpacity>
-          </View>
-
+    <SafeAreaView
+      className={`flex-1 ${styles.bgPrimary}`}
+      style={{ backgroundColor: isDarkMode ? '#1f2937' : '#f9fafb' }}>
+      {/* Header */}
+      <View className="mb-6 mt-4 flex-row items-center justify-between px-4">
+        <TouchableOpacity className="p-2" onPress={() => navigation.goBack()}>
+          <Text>
+            <Octicons name="arrow-left" size={24} color={isDarkMode ? '#d1d5db' : '#6b7280'} />
+          </Text>
+        </TouchableOpacity>
+        <Text className={`text-xl font-bold ${styles.textPrimary}`}>All Transactions</Text>
+        <TouchableOpacity className="p-2">
+          <Text>
+            <Octicons name="filter" size={24} color={isDarkMode ? '#d1d5db' : '#6b7280'} />
+          </Text>
+        </TouchableOpacity>
+      </View>
+      <ScrollView
+        className="flex-1"
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={['#8b5cf6']}
+            tintColor="#8b5cf6"
+          />
+        }>
+        <View className="mb-6">
           {loading ? (
             <View className="my-10 items-center justify-center">
               <ActivityIndicator size="large" color="#8b5cf6" />
             </View>
           ) : transactionsData.content.length > 0 ? (
             transactionsData.content.map((item: Transaction) => (
-              <View key={item.id} className={`mx-6 mb-3 rounded-xl ${styles.bgSecondary} p-4`}>
+              <View
+                key={item.id}
+                className={`mx-6 mb-3 rounded-xl ${isDarkMode ? 'bg-gray-900/20' : 'bg-white'} p-4`}>
                 <View className="flex-row items-center">
                   <View
                     className={`mr-3 h-10 w-10 items-center justify-center rounded-full ${styles.iconBg}`}>
@@ -161,19 +182,12 @@ const Transactions = () => {
                 } px-4 py-2`}
                 disabled={currentPage === 0}
                 onPress={handlePreviousPage}>
-                <Text
-                  className={`${
-                    currentPage === 0
-                      ? styles.textMuted
-                      : isDarkMode
-                        ? 'text-purple-300'
-                        : 'text-purple-600'
-                  }`}>
+                <Text className={`${isDarkMode ? 'text-purple-300' : 'text-purple-600'}`}>
                   Previous
                 </Text>
               </TouchableOpacity>
 
-              <Text className={styles.textSecondary}>
+              <Text className={`${isDarkMode ? 'text-purple-300' : 'text-purple-600'}`}>
                 Page {currentPage + 1} of {transactionsData.totalPages}
               </Text>
 
@@ -183,14 +197,7 @@ const Transactions = () => {
                 } px-4 py-2`}
                 disabled={currentPage === transactionsData.totalPages - 1}
                 onPress={handleNextPage}>
-                <Text
-                  className={`${
-                    currentPage === transactionsData.totalPages - 1
-                      ? styles.textMuted
-                      : isDarkMode
-                        ? 'text-purple-300'
-                        : 'text-purple-600'
-                  }`}>
+                <Text className={`${isDarkMode ? 'text-purple-300' : 'text-purple-600'}`}>
                   Next
                 </Text>
               </TouchableOpacity>

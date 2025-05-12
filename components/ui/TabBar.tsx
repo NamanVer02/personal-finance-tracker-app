@@ -48,7 +48,7 @@ const TabBar: React.FC<BottomTabBarProps> = ({ state, navigation, descriptors })
   return (
     <View
       className={`absolute bottom-6 flex-row items-center justify-center rounded-[32px] shadow-md shadow-black/10 ${
-        isDarkMode ? 'bg-gray-800' : 'bg-white'
+        isDarkMode ? 'bg-gray-900' : 'bg-white'
       }`}
       style={{
         width: TAB_BAR_WIDTH,

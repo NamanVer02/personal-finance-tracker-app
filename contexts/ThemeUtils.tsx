@@ -7,9 +7,9 @@ export const useThemeStyles = () => {
   const { isDarkMode } = useTheme();
 
   return {
-    // Background colors
-    bgPrimary: isDarkMode ? 'bg-gray-900' : 'bg-gray-50',
-    bgSecondary: isDarkMode ? 'bg-gray-800' : 'bg-white',
+    // Background colors - using absolute colors to ensure proper dark mode
+    bgPrimary: isDarkMode ? 'bg-gray-900/10' : 'bg-gray-50',
+    bgSecondary: isDarkMode ? 'bg-gray-900/20' : 'bg-white',
     bgAccent: 'bg-purple-500', // Keep accent colors consistent
     bgMuted: isDarkMode ? 'bg-gray-700' : 'bg-gray-100',
     bgCard: isDarkMode ? 'bg-gray-800' : 'bg-white',

@@ -98,7 +98,8 @@ const AddTransactionModal: React.FC<AddTransactionModalProps> = ({ visible, onCl
         onPress: handleSave,
       }}>
       {/* Transaction Type Selector */}
-      <View className="mb-6 flex-row rounded-xl bg-gray-100 p-1">
+      <View
+        className={`mb-6 flex-row rounded-xl ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'} p-1`}>
         <TouchableOpacity
           onPress={() => setTransactionType('Expense')}
           className={`flex-1 rounded-lg py-3 ${
@@ -106,7 +107,11 @@ const AddTransactionModal: React.FC<AddTransactionModalProps> = ({ visible, onCl
           }`}>
           <Text
             className={`text-center font-medium ${
-              transactionType === 'Expense' ? 'text-white' : 'text-gray-500'
+              transactionType === 'Expense'
+                ? 'text-white'
+                : isDarkMode
+                  ? 'text-gray-300'
+                  : 'text-gray-500'
             }`}>
             Expense
           </Text>
@@ -118,7 +123,11 @@ const AddTransactionModal: React.FC<AddTransactionModalProps> = ({ visible, onCl
           }`}>
           <Text
             className={`text-center font-medium ${
-              transactionType === 'Income' ? 'text-white' : 'text-gray-500'
+              transactionType === 'Income'
+                ? 'text-white'
+                : isDarkMode
+                  ? 'text-gray-300'
+                  : 'text-gray-500'
             }`}>
             Income
           </Text>
@@ -186,7 +195,7 @@ const AddTransactionModal: React.FC<AddTransactionModalProps> = ({ visible, onCl
         {/* Category List */}
         {showCategories && (
           <View
-            className={`mt-2 rounded-xl border ${styles.borderColor} ${styles.bgSecondary} shadow-sm`}>
+            className={`mt-2 rounded-xl border ${styles.borderColor} ${isDarkMode ? 'bg-gray-900/20' : 'bg-white'} shadow-sm`}>
             {currentCategories.map((cat) => (
               <TouchableOpacity
                 key={cat.id}

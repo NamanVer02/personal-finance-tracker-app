@@ -85,7 +85,9 @@ export default function Register() {
   };
 
   return (
-    <SafeAreaView className={`flex-1 ${styles.bgPrimary}`}>
+    <SafeAreaView
+      className={`flex-1 ${styles.bgPrimary}`}
+      style={{ backgroundColor: isDarkMode ? '#1f2937' : '#f9fafb' }}>
       <StatusBar style={isDarkMode ? 'light' : 'dark'} />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}

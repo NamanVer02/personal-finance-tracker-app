@@ -27,7 +27,9 @@ export default function GoogleAuthSetup() {
   };
 
   return (
-    <SafeAreaView className={`flex-1 ${styles.bgPrimary}`}>
+    <SafeAreaView
+      className={`flex-1 ${styles.bgPrimary}`}
+      style={{ backgroundColor: isDarkMode ? '#1f2937' : '#f9fafb' }}>
       <StatusBar style={isDarkMode ? 'light' : 'dark'} />
       <ScrollView contentContainerStyle={{ flexGrow: 1 }} className="px-6 py-10">
         <View className="mx-auto w-full max-w-[420px]">

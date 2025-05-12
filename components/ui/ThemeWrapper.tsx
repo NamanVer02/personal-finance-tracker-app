@@ -16,7 +16,13 @@ const ThemeWrapper: React.FC<ThemeWrapperProps> = ({ children }) => {
     setColorScheme(isDarkMode ? 'dark' : 'light');
   }, [isDarkMode, setColorScheme]);
 
-  return <View className={`flex-1 ${isDarkMode ? 'dark' : 'light'}`}>{children}</View>;
+  return (
+    <View
+      className={`flex-1 ${isDarkMode ? 'dark bg-gray-900' : 'light bg-gray-50'}`}
+      style={{ backgroundColor: isDarkMode ? '#1f2937' : '#f9fafb' }}>
+      {children}
+    </View>
+  );
 };
 
 export default ThemeWrapper;

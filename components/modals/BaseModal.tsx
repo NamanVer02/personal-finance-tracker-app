@@ -54,7 +54,8 @@ const BaseModal: React.FC<BaseModalProps> = ({
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={{ flex: 1 }}>
         <View className="flex-1 justify-end bg-black/50">
-          <View className={`${height} rounded-t-3xl ${styles.bgSecondary} p-6`}>
+          <View
+            className={`${height} rounded-t-3xl ${isDarkMode ? 'bg-gray-900/20' : 'bg-white'} p-6`}>
             {/* Header */}
             <View className="mb-6 flex-row items-center justify-between">
               <Text className={`text-2xl font-bold ${styles.textPrimary}`}>{title}</Text>

@@ -81,11 +81,16 @@ export const forgotPassword = async (username: string, twoFactorCode: number, ne
                 ok: true,
                 message: 'Password updated successfully',
             };
+        } else if (response.status === 429){
+            return {
+                ok: false,
+                message: 'Too many attempts to reset password. Try again in a few mintues',
+            };
         } else {
             return {
                 ok: false,
-                message: 'Failed to update password',
-            };
+                message: 'Some error occured. Please try again.'
+            }
         }
     } catch (error) {
         console.error('Error updating password:', error);

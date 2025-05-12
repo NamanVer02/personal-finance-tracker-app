@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   View,
   Image,
+  StatusBarStyle,
 } from 'react-native';
 import { Octicons } from '@expo/vector-icons';
 import { useUser } from 'contexts/UserContext';
@@ -27,6 +28,7 @@ import CsvUploadModal from 'components/modals/CsvUploadModal';
 
 export default function Dashboard() {
   const { user } = useUser();
+  const { isDarkMode } = useTheme();
   const styles = useThemeStyles();
   const navigation = useNavigation();
   const swipeableRefs = useRef<{ [key: number]: Swipeable | null }>({});
@@ -90,20 +92,28 @@ export default function Dashboard() {
   };
 
   const renderLeftActions = () => (
-    <TouchableOpacity className="flex-1 flex-row items-center pl-6">
+    <TouchableOpacity
+      className={`flex-1 flex-row items-center pl-6`}
+      style={{ backgroundColor: isDarkMode ? '#334155' : '#dbeafe' }}>
       <Text>
-        <Octicons name="pencil" size={20} color="#3B82F6" />
+        <Octicons name="pencil" size={20} color={isDarkMode ? '#60a5fa' : '#3B82F6'} />
       </Text>
-      <Text className="text-md ml-2 font-bold text-blue-900">Edit</Text>
+      <Text className={`text-md ml-2 font-bold ${isDarkMode ? 'text-blue-300' : 'text-blue-900'}`}>
+        Edit
+      </Text>
     </TouchableOpacity>
   );
 
   const renderRightActions = () => (
-    <TouchableOpacity className="flex-1 flex-row-reverse items-center pr-6">
+    <TouchableOpacity
+      className={`flex-1 flex-row-reverse items-center pr-6`}
+      style={{ backgroundColor: isDarkMode ? '#341520' : '#fee2e2' }}>
       <Text>
-        <Octicons name="trash" size={20} color="#EF4444" />
+        <Octicons name="trash" size={20} color={isDarkMode ? '#f87171' : '#EF4444'} />
       </Text>
-      <Text className="text-md mr-2 font-bold text-red-900">Delete</Text>
+      <Text className={`text-md mr-2 font-bold ${isDarkMode ? 'text-red-300' : 'text-red-900'}`}>
+        Delete
+      </Text>
     </TouchableOpacity>
   );
 
@@ -137,7 +147,9 @@ export default function Dashboard() {
   }
 
   return (
-    <SafeAreaView className={`flex-1 ${styles.bgPrimary}`}>
+    <SafeAreaView
+      className={`flex-1 ${styles.bgPrimary}`}
+      style={{ backgroundColor: isDarkMode ? '#1f2937' : '#f9fafb' }}>
       <AddTransactionModal
         visible={addTransactionModalVisible}
         onClose={() => setAddTransactionModalVisible(false)}
@@ -177,7 +189,6 @@ export default function Dashboard() {
         onUploadSuccess={handleSyncData}
       />
 
-      <StatusBar barStyle={styles.statusBarStyle} backgroundColor={styles.statusBarBgColor} />
       <ScrollView className="flex-1 p-4">
         {/* Header */}
         <View className="flex-row items-center justify-between px-4 pb-8 pt-2">
@@ -297,7 +308,8 @@ export default function Dashboard() {
                         setSwipedId(item.id);
                       }
                     }}>
-                    <View className={`mb-3 rounded-xl ${styles.bgSecondary} p-4`}>
+                    <View
+                      className={`mb-3 rounded-xl ${isDarkMode ? 'bg-gray-900/20' : 'bg-white'} p-4`}>
                       <View className="flex-row items-center">
                         <View
                           className={`mr-3 h-10 w-10 items-center justify-center rounded-full ${styles.iconBg}`}>
