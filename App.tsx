@@ -27,7 +27,7 @@ function BottomTabNavigator() {
   return (
     <BottomTab.Navigator
       tabBar={(props) => <TabBar {...props} />}
-      screenOptions={{ headerShown: false }}>
+      screenOptions={{ headerShown: false, animation:'shift' }}>
       <BottomTab.Screen name="Dashboard" component={Dashboard} />
       <BottomTab.Screen name="Analytics" component={Analytics} />
       <BottomTab.Screen name="Transactions" component={Transactions} />
@@ -62,11 +62,31 @@ function AppLoader() {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="Login" component={Login} />
-        <Stack.Screen name="Register" component={Register} />
-        <Stack.Screen name="GoogleAuthSetup" component={GoogleAuthSetup} />
-        <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
-        <Stack.Screen name="Main" component={BottomTabNavigator} options={{ headerShown: false }} />
+        <Stack.Screen
+          name="Login"
+          component={Login}
+          options={{ headerShown: false, animation: 'slide_from_left' }}
+        />
+        <Stack.Screen
+          name="Register"
+          component={Register}
+          options={{ headerShown: false, animation: 'slide_from_left' }}
+        />
+        <Stack.Screen
+          name="GoogleAuthSetup"
+          component={GoogleAuthSetup}
+          options={{ headerShown: false, animation: 'slide_from_left' }}
+        />
+        <Stack.Screen
+          name="ForgotPassword"
+          component={ForgotPassword}
+          options={{ headerShown: false, animation: 'slide_from_left' }}
+        />
+        <Stack.Screen
+          name="Main"
+          component={BottomTabNavigator}
+          options={{ headerShown: false, animation: 'slide_from_left' }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

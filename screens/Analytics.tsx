@@ -81,8 +81,7 @@ export default function FinancialAnalysisScreen() {
   }, []);
 
   const renderDateRangeSelector = () => (
-    <View
-      className={`mx-4 mb-6 flex-row justify-center rounded-full ${styles.bgSecondary} p-1`}>
+    <View className={`mx-4 mb-6 flex-row justify-center rounded-full ${styles.bgSecondary} p-1`}>
       <TouchableOpacity
         className={`flex-1 rounded-full py-2 ${dateRange === 'week' ? 'bg-purple-500' : 'bg-transparent'}`}
         onPress={() => updateDateRange('week')}>
@@ -150,7 +149,11 @@ export default function FinancialAnalysisScreen() {
     if (!analytics || !analytics.monthlyTrend.length) return null;
 
     const chartData = {
-      labels: analytics.monthlyTrend.map((item) => item.month),
+      labels: analytics.monthlyTrend.map((item) => {
+        // Extract only the month name from the month string
+        // Assuming the format is "Month Year" like "Jan 2023"
+        return item.month.split(' ')[0];
+      }),
       datasets: [
         {
           data: analytics.monthlyTrend.map((item) => item.income),
@@ -213,14 +216,84 @@ export default function FinancialAnalysisScreen() {
   const renderCategoryBreakdown = () => {
     if (!analytics || !analytics.categoryBreakdown.length) return null;
 
-    // Prepare data for pie chart
+    // Color palette with shades of purple, dark blue, and light blue for better differentiation
+    const colorPalette = [
+      // Purple shades
+      '#8b5cf6', // Purple
+      '#7c3aed', // Violet
+      '#6d28d9', // Dark purple
+      '#9333ea', // Purple-pink
+
+      // Light blue shades
+      '#38bdf8', // Sky blue
+      '#0ea5e9', // Light blue
+      '#7dd3fc', // Very light blue
+      '#93c5fd', // Baby blue
+
+      // Blue shades
+      '#3b82f6', // Blue
+      '#2563eb', // Royal blue
+      '#1d4ed8', // Medium blue
+      '#1e40af', // Dark blue
+
+      // More distinct colors
+      '#c084fc', // Light violet
+      '#818cf8', // Periwinkle
+      '#60a5fa', // Bright blue
+      '#4f46e5', // Indigo-blue
+      '#a78bfa', // Light purple
+      '#5b21b6', // Deeper purple
+      '#0284c7', // Vivid blue
+      '#0369a1', // Deep sky blue
+    ];
+
+    // Add more colors dynamically if needed (for extreme cases with many categories)
+    if (analytics.categoryBreakdown.length > colorPalette.length) {
+      // Generate additional colors by alternating between light and dark shades
+      for (let i = 0; i < 10; i++) {
+        const baseColor = colorPalette[i % colorPalette.length];
+
+        // Create a contrasting shade based on original color
+        // If it's a dark color, make it lighter; if it's light, make it darker
+        const r = parseInt(baseColor.slice(1, 3), 16);
+        const g = parseInt(baseColor.slice(3, 5), 16);
+        const b = parseInt(baseColor.slice(5, 7), 16);
+
+        // Calculate brightness (simple approximation)
+        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+
+        let newColor;
+        if (brightness > 128) {
+          // Darker variant for light colors
+          newColor = `#${Math.max(0, r - 40)
+            .toString(16)
+            .padStart(2, '0')}${Math.max(0, g - 30)
+            .toString(16)
+            .padStart(2, '0')}${Math.max(0, b - 20)
+            .toString(16)
+            .padStart(2, '0')}`;
+        } else {
+          // Lighter variant for dark colors
+          newColor = `#${Math.min(255, r + 40)
+            .toString(16)
+            .padStart(2, '0')}${Math.min(255, g + 30)
+            .toString(16)
+            .padStart(2, '0')}${Math.min(255, b + 70)
+            .toString(16)
+            .padStart(2, '0')}`;
+        }
+
+        colorPalette.push(newColor);
+      }
+    }
+
+    // Generate a unique color for each category
     const pieData = analytics.categoryBreakdown.map((item, index) => {
-      const colors = ['#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#ec4899'];
       return {
         name: item.category,
         amount: item.amount,
         percentage: item.percentage,
-        color: colors[index % colors.length],
+        color: colorPalette[index % colorPalette.length],
         legendFontColor: isDarkMode ? '#d1d5db' : '#7F7F7F',
         legendFontSize: 12,
       };
@@ -231,46 +304,61 @@ export default function FinancialAnalysisScreen() {
         <Text className={`mb-4 text-lg font-semibold ${styles.textPrimary}`}>
           Spending by Category
         </Text>
-        <PieChart
-          data={pieData}
-          width={screenWidth - 96}
-          height={220}
-          chartConfig={{
-            backgroundColor: 'transparent',
-            backgroundGradientFrom: 'transparent',
-            backgroundGradientTo: 'transparent',
-            color: (opacity = 1) =>
-              isDarkMode ? `rgba(255, 255, 255, ${opacity})` : `rgba(0, 0, 0, ${opacity})`,
-            labelColor: (opacity = 1) =>
-              isDarkMode ? `rgba(255, 255, 255, ${opacity})` : `rgba(0, 0, 0, ${opacity})`,
-          }}
-          accessor="amount"
-          backgroundColor="transparent"
-          paddingLeft="15"
-          absolute
-          hasLegend={true}
-          style={{
-            borderRadius: 16,
-            backgroundColor: 'transparent',
-          }}
-        />
+        <View className="mb-4">
+          <PieChart
+            data={pieData}
+            width={screenWidth - 96}
+            height={180}
+            chartConfig={{
+              backgroundColor: 'transparent',
+              backgroundGradientFrom: 'transparent',
+              backgroundGradientTo: 'transparent',
+              color: (opacity = 1) =>
+                isDarkMode ? `rgba(255, 255, 255, ${opacity})` : `rgba(0, 0, 0, ${opacity})`,
+              labelColor: (opacity = 1) =>
+                isDarkMode ? `rgba(255, 255, 255, ${opacity})` : `rgba(0, 0, 0, ${opacity})`,
+            }}
+            accessor="amount"
+            backgroundColor="transparent"
+            paddingLeft="15"
+            absolute
+            hasLegend={false}
+            style={{
+              borderRadius: 16,
+              backgroundColor: 'transparent',
+            }}
+            avoidFalseZero
+          />
+        </View>
 
-        <View className="mt-4">
-          {analytics.categoryBreakdown.map((item, index) => (
-            <View key={index} className="mb-2 flex-row items-center justify-between">
-              <View className="flex-row items-center">
-                <View
-                  className="mr-2 h-3 w-3 rounded-full"
-                  style={{ backgroundColor: pieData[index].color }}
-                />
-                <Text className={styles.textPrimary}>{item.category}</Text>
+        {/* Optimized legend for mobile viewing */}
+        <View>
+          <Text className={`mb-3 text-sm font-medium ${styles.textPrimary}`}>Categories</Text>
+
+          {/* Efficient grid layout for better space usage */}
+          <View className="flex-row flex-wrap">
+            {analytics.categoryBreakdown.map((item, index) => (
+              <View key={index} className={`mb-3 pr-2 ${screenWidth < 350 ? 'w-full' : 'w-1/2'}`}>
+                <View className="flex-row items-center">
+                  <View
+                    className="mr-2 h-2.5 w-2.5 rounded-full"
+                    style={{ backgroundColor: pieData[index].color }}
+                  />
+                  <Text
+                    className={`${styles.textPrimary} flex-1 text-sm font-medium`}
+                    numberOfLines={1}
+                    ellipsizeMode="tail">
+                    {item.category}
+                  </Text>
+                </View>
+                <Text
+                  className="ml-4 text-xs"
+                  style={{ color: isDarkMode ? '#9ca3af' : '#6b7280' }}>
+                  ${item.amount.toFixed(0)} ({item.percentage.toFixed(0)}%)
+                </Text>
               </View>
-              <View className="flex-row">
-                <Text className={`mr-2 ${styles.textSecondary}`}>${item.amount.toFixed(2)}</Text>
-                <Text className={styles.textMuted}>({item.percentage.toFixed(1)}%)</Text>
-              </View>
-            </View>
-          ))}
+            ))}
+          </View>
         </View>
       </View>
     );
